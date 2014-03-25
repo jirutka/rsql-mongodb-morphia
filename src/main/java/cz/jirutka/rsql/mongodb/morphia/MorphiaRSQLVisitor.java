@@ -161,7 +161,8 @@ public class MorphiaRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
 
     protected FieldCriteria createCriteria(String fieldPath, FilterOperator operator, Object value) {
 
-        return new FieldCriteria(query, fieldPath, operator, value, false, false) {
+        // argument validateNames must be true, otherwise field name is not mapped to key!
+        return new FieldCriteria(query, fieldPath, operator, value, true, false) {
             // subclass is needed just to access the protected constructor.
         };
     }

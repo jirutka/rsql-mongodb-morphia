@@ -23,9 +23,12 @@
  */
 package cz.jirutka.rsql.mongodb.morphia.fixtures
 
+import org.mongodb.morphia.annotations.Id
 import org.mongodb.morphia.annotations.Property
 
 class RootEntity {
+
+    @Id Long entityId
 
     String a, b, c, d
 
