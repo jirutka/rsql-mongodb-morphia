@@ -25,6 +25,7 @@ package cz.jirutka.rsql.mongodb.morphia.internal;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.mapping.MappedField;
 import org.mongodb.morphia.mapping.Mapper;
 import org.mongodb.morphia.query.ValidationException;
@@ -64,5 +65,12 @@ public class MappedFieldPath {
         MappedField mf = Mapper.validate(entityClass, mapper, mutablePath, null, "nullValue", true, false);
 
         return new MappedFieldPath(mf, mutablePath.toString());
+    }
+
+    /**
+     * Whether the mapped field is a {@link Reference}.
+     */
+    public boolean isReference() {
+        return mappedField.hasAnnotation(Reference.class);
     }
 }

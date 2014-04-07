@@ -4,6 +4,7 @@ import cz.jirutka.rsql.mongodb.morphia.internal.MappedFieldPath;
 import cz.jirutka.rsql.mongodb.morphia.internal.SimpleFieldCriteria;
 import cz.jirutka.rsql.parser.ast.*;
 import net.jcip.annotations.ThreadSafe;
+import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.mapping.MappedField;
 import org.mongodb.morphia.mapping.Mapper;
 import org.mongodb.morphia.query.*;
@@ -108,7 +109,9 @@ public class MorphiaRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
 
         Object mappedValue = mapper.toMongoObject(mfp.getMappedField(), null, value);
 
-        return new SimpleFieldCriteria(mfp.getFieldPath(), operator, mappedValue);
+        String fieldPath = mfp.isReference() ? mfp.getFieldPath() + ".$id" : mfp.getFieldPath();
+
+        return new SimpleFieldCriteria(fieldPath, operator, mappedValue);
     }
 
     protected MappedFieldPath resolveMappedField(String selector) {
@@ -122,7 +125,15 @@ public class MorphiaRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
 
     protected Class<?> determineFieldType(MappedField mf) {
         // subType/subClass is actually a generic type...
-        return (mf.isMultipleValues() && mf.getSubType() != null) ? mf.getSubClass() : mf.getType();
+        Class<?> type = (mf.isMultipleValues() && mf.getSubType() != null) ? mf.getSubClass() : mf.getType();
+
+        if (mf.hasAnnotation(Reference.class)) {
+            MappedField idField = mapper.getMappedClass(type).getMappedIdField();
+            return determineFieldType(idField);
+
+        } else {
+            return type;
+        }
     }
 
 

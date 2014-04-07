@@ -25,6 +25,7 @@ package cz.jirutka.rsql.mongodb.morphia.fixtures
 
 import org.mongodb.morphia.annotations.Id
 import org.mongodb.morphia.annotations.Property
+import org.mongodb.morphia.annotations.Reference
 
 class RootEntity {
 
@@ -36,6 +37,9 @@ class RootEntity {
     Set<String> genres
     List<ChildEntity> actors
     ChildEntity director
+
+    @Reference(lazy=true)
+    RootEntity parent
 
     @Property('name')
     String title

@@ -77,6 +77,7 @@ class MorphiaRSQLVisitorTest extends Specification {
             'director.birthdate' | Date
             'actors.birthdate'   | Date
             'actors.movies.year' | int
+            'parent'             | Long
     }
 
     def 'throw RSQLValidationException when field could not be found'() {
@@ -133,6 +134,18 @@ class MorphiaRSQLVisitorTest extends Specification {
             rsql            | expected
             'title==Matrix' | [ name: 'Matrix' ]
             'entityId==123' | [ _id: '123' ]
+    }
+
+    def 'convert RSQL to Mongo query with <field>.$id when field is @Reference'() {
+        setup:
+            def rootNode = parse(rsql)
+        when:
+            query.and( rootNode.accept(visitor) )
+        then:
+            query.queryObject == expected
+        where:
+            rsql          | expected
+            'parent==123' | [ 'parent.$id': '123' ]
     }
 
 
