@@ -25,14 +25,6 @@ class MorphiaRSQLVisitorTest extends Specification {
     def visitor = new MorphiaRSQLVisitor(RootEntity, dataStore.mapper, fakeConverter)
 
 
-    def 'construct from query object'() {
-        when:
-            def instance = new MorphiaRSQLVisitor(query, fakeConverter)
-        then:
-            instance.mapper == dataStore.mapper
-            instance.entityClass == query.entityClass
-    }
-
     @Unroll
     def 'should map operator: #rsqlOperator'() {
         setup:
@@ -71,8 +63,10 @@ class MorphiaRSQLVisitorTest extends Specification {
 
     @Unroll
     def 'determine field type for selector: #selector'() {
+        setup:
+            def mf = visitor.resolveMappedField(selector)
         expect:
-            visitor.determineFieldType(selector) == type
+            visitor.determineFieldType(mf.mappedField) == type
         where:
             selector             | type
             'year'               | int

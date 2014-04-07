@@ -68,7 +68,7 @@ public class MorphiaRSQL {
         Node rootNode = parse(rsql);
 
         Query<T> query = datastore.createQuery(entityClass);
-        MorphiaRSQLVisitor visitor = new MorphiaRSQLVisitor(query, converter);
+        MorphiaRSQLVisitor visitor = new MorphiaRSQLVisitor(entityClass, getMapper(), converter);
 
         query.and(rootNode.accept(visitor));
 
