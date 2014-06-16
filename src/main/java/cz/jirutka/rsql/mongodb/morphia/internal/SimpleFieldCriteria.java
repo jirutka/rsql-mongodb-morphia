@@ -25,7 +25,6 @@ package cz.jirutka.rsql.mongodb.morphia.internal;
 
 import com.mongodb.DBObject;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.mongodb.morphia.query.AbstractCriteria;
 import org.mongodb.morphia.query.FilterOperator;
 
