@@ -2,9 +2,9 @@ package cz.jirutka.rsql.mongodb.morphia
 
 import cz.jirutka.rsql.mongodb.morphia.fixtures.ChildEntity
 import cz.jirutka.rsql.mongodb.morphia.fixtures.RootEntity
+import cz.jirutka.rsql.mongodb.parser.MongoRSQLNodesFactory
 import cz.jirutka.rsql.parser.RSQLParser
 import cz.jirutka.rsql.parser.ast.ComparisonOp
-import cz.jirutka.rsql.parser.ast.RSQLNodesFactory
 import org.mongodb.morphia.query.FieldCriteria
 import spock.lang.Shared
 import spock.lang.Specification
@@ -28,8 +28,8 @@ class MorphiaRSQLVisitorTest extends Specification {
     @Unroll
     def 'should map operator: #rsqlOperator'() {
         setup:
-            def args = mongoOperator in [IN, NOT_IN] ? ['x', 'y'] : 'x'
-            def rootNode = new RSQLNodesFactory().createComparisonNode(rsqlOperator.toString(), 'a', args)
+            def args = mongoOperator in [IN, NOT_IN, ALL] ? ['x', 'y'] : 'x'
+            def rootNode = new MongoRSQLNodesFactory().createComparisonNode(rsqlOperator.toString(), 'a', args)
         and:
             def expected = dataStore.createQuery(RootEntity)
             expected.and(fieldCriteria('a', mongoOperator, args))
@@ -47,6 +47,7 @@ class MorphiaRSQLVisitorTest extends Specification {
             ComparisonOp.LE  | LESS_THAN_OR_EQUAL
             ComparisonOp.IN  | IN
             ComparisonOp.OUT | NOT_IN
+            '=all='          | ALL
     }
 
     @Unroll
@@ -162,6 +163,6 @@ class MorphiaRSQLVisitorTest extends Specification {
     }
 
     def parse(String rsql) {
-        new RSQLParser().parse(rsql)
+        new RSQLParser(new MongoRSQLNodesFactory()).parse(rsql)
     }
 }

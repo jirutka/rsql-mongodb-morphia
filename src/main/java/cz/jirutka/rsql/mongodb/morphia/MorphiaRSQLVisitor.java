@@ -2,12 +2,16 @@ package cz.jirutka.rsql.mongodb.morphia;
 
 import cz.jirutka.rsql.mongodb.morphia.internal.MappedFieldPath;
 import cz.jirutka.rsql.mongodb.morphia.internal.SimpleFieldCriteria;
+import cz.jirutka.rsql.mongodb.parser.AllNode;
+import cz.jirutka.rsql.mongodb.parser.NoArgMongoRSQLVisitorAdapter;
 import cz.jirutka.rsql.parser.ast.*;
 import net.jcip.annotations.ThreadSafe;
 import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.mapping.MappedField;
 import org.mongodb.morphia.mapping.Mapper;
 import org.mongodb.morphia.query.*;
+
+import java.util.EnumSet;
 
 import static org.mongodb.morphia.query.CriteriaJoin.AND;
 import static org.mongodb.morphia.query.CriteriaJoin.OR;
@@ -19,7 +23,7 @@ import static org.mongodb.morphia.query.FilterOperator.*;
  * MongoDB/Morphia {@link Criteria}.
  */
 @ThreadSafe
-public class MorphiaRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
+public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
 
     private final Class<?> entityClass;
 
@@ -83,6 +87,10 @@ public class MorphiaRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
 
     public Criteria visit(NotInNode node) {
         return createCriteria(node, NOT_IN);
+    }
+
+    public Criteria visit(AllNode node) {
+        return createCriteria(node, ALL);
     }
 
 
@@ -149,6 +157,6 @@ public class MorphiaRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
     }
 
     private boolean isMultiValuesFilter(FilterOperator operator) {
-        return operator == FilterOperator.IN || operator == FilterOperator.NOT_IN;
+        return EnumSet.of(IN, NOT_IN, ALL).contains(operator);
     }
 }

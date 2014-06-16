@@ -23,6 +23,7 @@
  */
 package cz.jirutka.rsql.mongodb.morphia;
 
+import cz.jirutka.rsql.mongodb.parser.MongoRSQLNodesFactory;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.RSQLParserException;
 import cz.jirutka.rsql.parser.ast.Node;
@@ -43,7 +44,7 @@ public class MorphiaRSQL {
     private StringConverter converter = new DefaultStringConverter();
 
     @Getter @Setter
-    private RSQLParser rsqlParser = new RSQLParser();
+    private RSQLParser rsqlParser = new RSQLParser(new MongoRSQLNodesFactory());
 
     // lazy initialized
     private Mapper mapper;
