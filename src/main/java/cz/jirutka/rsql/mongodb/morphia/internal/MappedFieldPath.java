@@ -25,52 +25,15 @@ package cz.jirutka.rsql.mongodb.morphia.internal;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.mapping.MappedField;
-import org.mongodb.morphia.mapping.Mapper;
-import org.mongodb.morphia.query.ValidationException;
 
-/**
- * Container for {@link MappedField} and field path.
- */
 @Getter
 @AllArgsConstructor
 public class MappedFieldPath {
 
-    private final MappedField mappedField;
-
     private final String fieldPath;
 
+    private final MappedField mappedField;
 
-    /**
-     * Resolves a mapped field and validates that it exists.
-     *
-     * @param fieldPath The field name or a path of the field inside
-     *        a subdocument(s) (using dot notation).
-     * @param entityClass A class of the {@link org.mongodb.morphia.annotations.Entity Entity}
-     *        that hold the field.
-     * @param mapper The Morphia mapper used for resolving the field.
-     *
-     * @return A {@code MappedFieldPath} instance that holds resolved
-     *        {@link MappedField} and field path.
-     * @throws ValidationException If the field does not exists or invalid use
-     *         of dot notation.
-     */
-    public static MappedFieldPath resolveFieldPath(String fieldPath, Class<?> entityClass, Mapper mapper) throws ValidationException {
-
-        // this will be modified by Mapper.validate()
-        StringBuilder mutablePath = new StringBuilder(fieldPath);
-
-        // we don't wanna validate the value, just find the mapped field
-        MappedField mf = Mapper.validate(entityClass, mapper, mutablePath, null, "nullValue", true, false);
-
-        return new MappedFieldPath(mf, mutablePath.toString());
-    }
-
-    /**
-     * Whether the mapped field is a {@link Reference}.
-     */
-    public boolean isReference() {
-        return mappedField.hasAnnotation(Reference.class);
-    }
+    private final Class<?> targetValueType;
 }

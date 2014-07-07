@@ -1,13 +1,12 @@
 package cz.jirutka.rsql.mongodb.morphia;
 
 import cz.jirutka.rsql.mongodb.morphia.internal.MappedFieldPath;
+import cz.jirutka.rsql.mongodb.morphia.internal.MappedFieldPathResolver;
 import cz.jirutka.rsql.mongodb.morphia.internal.SimpleFieldCriteria;
 import cz.jirutka.rsql.mongodb.parser.AllNode;
 import cz.jirutka.rsql.mongodb.parser.NoArgMongoRSQLVisitorAdapter;
 import cz.jirutka.rsql.parser.ast.*;
 import net.jcip.annotations.ThreadSafe;
-import org.mongodb.morphia.annotations.Reference;
-import org.mongodb.morphia.mapping.MappedField;
 import org.mongodb.morphia.mapping.Mapper;
 import org.mongodb.morphia.query.*;
 
@@ -31,6 +30,12 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
 
     private final StringConverter converter;
 
+    private final MappedFieldPathResolver fieldPathResolver;
+
+
+    public MorphiaRSQLVisitor(Class<?> entityClass, Mapper mapper, StringConverter converter) {
+        this(entityClass, mapper, converter, new MappedFieldPathResolver(mapper));
+    }
 
     /**
      * Creates a new instance of {@code MorphiaRSQLVisitor} for the specified
@@ -41,11 +46,14 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
      * @param mapper The Morphia mapper used for validation and determining
      *               a field type.
      * @param converter
+     * @param fieldPathResolver
      */
-    public MorphiaRSQLVisitor(Class<?> entityClass, Mapper mapper, StringConverter converter) {
+    public MorphiaRSQLVisitor(Class<?> entityClass, Mapper mapper, StringConverter converter,
+                              MappedFieldPathResolver fieldPathResolver) {
         this.entityClass = entityClass;
         this.mapper = mapper;
         this.converter = converter;
+        this.fieldPathResolver = fieldPathResolver;
     }
 
 
@@ -108,40 +116,15 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
         if (!isMultiValuesFilter(operator) && node.getArguments().size() != 1) {
             throw new RSQLValidationException("Single argument excepted, but got: " + node.getArguments());
         }
-        MappedFieldPath mfp = resolveMappedField(node.getSelector());
-        Class<?> targetType = determineFieldType(mfp.getMappedField());
+        MappedFieldPath mfp = fieldPathResolver.resolveFieldPath(node.getSelector(), entityClass);
 
         Object value = isMultiValuesFilter(operator)
-                ? converter.convert(node.getArguments(), targetType)
-                : converter.convert(node.getArguments().get(0), targetType);
+                ? converter.convert(node.getArguments(), mfp.getTargetValueType())
+                : converter.convert(node.getArguments().get(0), mfp.getTargetValueType());
 
         Object mappedValue = mapper.toMongoObject(mfp.getMappedField(), null, value);
 
-        String fieldPath = mfp.isReference() ? mfp.getFieldPath() + ".$id" : mfp.getFieldPath();
-
-        return new SimpleFieldCriteria(fieldPath, operator, mappedValue);
-    }
-
-    protected MappedFieldPath resolveMappedField(String selector) {
-        try {
-            return MappedFieldPath.resolveFieldPath(selector, entityClass, mapper);
-
-        } catch (ValidationException ex) {
-            throw new RSQLValidationException("Could not find matching field for selector: " + selector, ex);
-        }
-    }
-
-    protected Class<?> determineFieldType(MappedField mf) {
-        // subType/subClass is actually a generic type...
-        Class<?> type = (mf.isMultipleValues() && mf.getSubType() != null) ? mf.getSubClass() : mf.getType();
-
-        if (mf.hasAnnotation(Reference.class)) {
-            MappedField idField = mapper.getMappedClass(type).getMappedIdField();
-            return determineFieldType(idField);
-
-        } else {
-            return type;
-        }
+        return new SimpleFieldCriteria(mfp.getFieldPath(), operator, mappedValue);
     }
 
 

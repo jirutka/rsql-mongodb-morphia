@@ -1,6 +1,5 @@
 package cz.jirutka.rsql.mongodb.morphia
 
-import cz.jirutka.rsql.mongodb.morphia.fixtures.ChildEntity
 import cz.jirutka.rsql.mongodb.morphia.fixtures.RootEntity
 import cz.jirutka.rsql.mongodb.parser.MongoRSQLNodesFactory
 import cz.jirutka.rsql.parser.RSQLParser
@@ -60,25 +59,6 @@ class MorphiaRSQLVisitorTest extends Specification {
             thrown RSQLValidationException
         where:
             operator << ComparisonOp.values() - [ComparisonOp.IN, ComparisonOp.OUT]
-    }
-
-    @Unroll
-    def 'determine field type for selector: #selector'() {
-        setup:
-            def mf = visitor.resolveMappedField(selector)
-        expect:
-            visitor.determineFieldType(mf.mappedField) == type
-        where:
-            selector             | type
-            'year'               | int
-            'entityId'           | Long
-            'name'               | String
-            'genres'             | String
-            'director'           | ChildEntity
-            'director.birthdate' | Date
-            'actors.birthdate'   | Date
-            'actors.movies.year' | int
-            'parent'             | Long
     }
 
     def 'throw RSQLValidationException when field could not be found'() {
