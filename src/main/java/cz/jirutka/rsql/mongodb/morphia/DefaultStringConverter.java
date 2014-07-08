@@ -78,7 +78,7 @@ public class DefaultStringConverter extends AbstractStringConverter {
 
 
     @SuppressWarnings("unchecked")
-    public <T> T convert(String value, Class<T> type) throws ArgumentFormatException {
+    public <T> T convert(String value, Class<T> type) throws RSQLArgumentFormatException {
 
         log.trace("Parsing argument '{}' as type: {}", value, type.getSimpleName());
 
@@ -109,7 +109,7 @@ public class DefaultStringConverter extends AbstractStringConverter {
                 return (T) parseDate(value);
             }
         } catch (IllegalArgumentException ex) {
-            throw new ArgumentFormatException(value, type, ex);
+            throw new RSQLArgumentFormatException(value, type, ex);
         }
 
         // try to parse via valueOf(String s) method
@@ -122,13 +122,13 @@ public class DefaultStringConverter extends AbstractStringConverter {
             log.debug("{} does not have method valueOf(String s)", type);
 
         } catch (InvocationTargetException ex) {
-            throw new ArgumentFormatException(value, type, ex);
+            throw new RSQLArgumentFormatException(value, type, ex);
 
         } catch (IllegalAccessException ex) {
             throw new IllegalStateException(ex);
         }
 
-        throw new ArgumentFormatException(value, type);
+        throw new RSQLArgumentFormatException(value, type);
     }
 
 
@@ -152,7 +152,7 @@ public class DefaultStringConverter extends AbstractStringConverter {
                 return e;
             }
         }
-        throw new ArgumentFormatException(value, enumClass);
+        throw new RSQLArgumentFormatException(value, enumClass);
     }
 
     protected Date parseDate(String value) {
@@ -163,6 +163,6 @@ public class DefaultStringConverter extends AbstractStringConverter {
                 // ignore
             }
         }
-        throw new ArgumentFormatException(value, Date.class);
+        throw new RSQLArgumentFormatException(value, Date.class);
     }
 }

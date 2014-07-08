@@ -98,14 +98,14 @@ class DefaultStringConverterTest extends Specification {
         when:
             converter.convert('throw!', MockValueOf)
         then:
-            thrown ArgumentFormatException
+            thrown RSQLArgumentFormatException
     }
 
     def 'throw ArgumentFormatException when value is illegal #type'() {
         when:
             converter.convert(value, type)
         then:
-            def ex = thrown(ArgumentFormatException)
+            def ex = thrown(RSQLArgumentFormatException)
         and:
             ex.value == value
             ex.targetType == type
@@ -123,7 +123,7 @@ class DefaultStringConverterTest extends Specification {
         when:
             converter.convert('foo', DefaultStringConverter)
         then:
-            thrown ArgumentFormatException
+            thrown RSQLArgumentFormatException
     }
 
 

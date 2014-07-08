@@ -26,19 +26,19 @@ package cz.jirutka.rsql.mongodb.morphia;
 import lombok.Getter;
 
 @Getter
-public class ArgumentFormatException extends IllegalArgumentException {
+public class RSQLArgumentFormatException extends RSQLException {
 
     private final String value;
     private final Class<?> targetType;
 
 
-    public ArgumentFormatException(String value, Class<?> targetType, Throwable cause) {
+    public RSQLArgumentFormatException(String value, Class<?> targetType, Throwable cause) {
         super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()), cause);
         this.value = value;
         this.targetType = targetType;
     }
 
-    public ArgumentFormatException(String value, Class<?> targetType) {
+    public RSQLArgumentFormatException(String value, Class<?> targetType) {
         super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()));
         this.value = value;
         this.targetType = targetType;

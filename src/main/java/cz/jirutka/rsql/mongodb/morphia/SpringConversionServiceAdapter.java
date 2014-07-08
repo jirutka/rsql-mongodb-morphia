@@ -46,7 +46,7 @@ public class SpringConversionServiceAdapter extends AbstractStringConverter {
             return conversionService.convert(value, targetType);
 
         } catch (ConversionFailedException ex) {
-            throw new ArgumentFormatException(value, targetType, ex);
+            throw new RSQLArgumentFormatException(value, targetType, ex);
         }
     }
 

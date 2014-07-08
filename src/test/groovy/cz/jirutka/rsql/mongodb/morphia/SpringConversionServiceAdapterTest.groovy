@@ -53,6 +53,6 @@ class SpringConversionServiceAdapterTest extends Specification {
         when:
             adapter.convert('bang!', Date)
         then:
-            thrown ArgumentFormatException
+            thrown RSQLArgumentFormatException
     }
 }

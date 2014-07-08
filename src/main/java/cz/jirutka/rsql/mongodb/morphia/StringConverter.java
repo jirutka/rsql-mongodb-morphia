@@ -30,14 +30,14 @@ public interface StringConverter {
     /**
      * Convert the given {@code String} to targetType.
      *
-     * @throws ArgumentFormatException if a conversion exception occurred.
+     * @throws RSQLArgumentFormatException if a conversion exception occurred.
      */
     <T> T convert(String value, Class<T> targetType);
 
     /**
      * Convert {@code String} values from the given collection to the targetType.
      *
-     * @throws ArgumentFormatException if a conversion exception occurred.
+     * @throws RSQLArgumentFormatException if a conversion exception occurred.
      */
     <T> Collection<? extends T> convert(Collection<String> source, Class<T> targetType);
 }
