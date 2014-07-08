@@ -32,14 +32,14 @@ public class ArgumentFormatException extends IllegalArgumentException {
     private final Class<?> targetType;
 
 
-    public ArgumentFormatException(String value, Class<?> targetType, String message) {
-        super(message);
+    public ArgumentFormatException(String value, Class<?> targetType, Throwable cause) {
+        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()), cause);
         this.value = value;
         this.targetType = targetType;
     }
 
     public ArgumentFormatException(String value, Class<?> targetType) {
-        super(String.format("Cannot cast value '%s' to: %s", value, targetType));
+        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()));
         this.value = value;
         this.targetType = targetType;
     }

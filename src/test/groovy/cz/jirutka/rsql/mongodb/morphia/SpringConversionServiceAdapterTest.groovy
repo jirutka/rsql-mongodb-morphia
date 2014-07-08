@@ -23,6 +23,7 @@
  */
 package cz.jirutka.rsql.mongodb.morphia
 
+import org.springframework.core.convert.ConversionFailedException
 import org.springframework.core.convert.ConversionService
 import spock.lang.Specification
 
@@ -44,5 +45,14 @@ class SpringConversionServiceAdapterTest extends Specification {
             adapter.convert('allons-y!', String)
         then:
             0 * conversionService._
+    }
+
+    def 'throw ArgumentFormatException when conversion fails'() {
+        setup:
+            conversionService._ >> { throw new ConversionFailedException(null, null, null, new RuntimeException()) }
+        when:
+            adapter.convert('bang!', Date)
+        then:
+            thrown ArgumentFormatException
     }
 }

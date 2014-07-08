@@ -109,7 +109,7 @@ public class DefaultStringConverter extends AbstractStringConverter {
                 return (T) parseDate(value);
             }
         } catch (IllegalArgumentException ex) {
-            throw new ArgumentFormatException(value, type);
+            throw new ArgumentFormatException(value, type, ex);
         }
 
         // try to parse via valueOf(String s) method
@@ -122,13 +122,13 @@ public class DefaultStringConverter extends AbstractStringConverter {
             log.debug("{} does not have method valueOf(String s)", type);
 
         } catch (InvocationTargetException ex) {
-            throw new ArgumentFormatException(value, type);
+            throw new ArgumentFormatException(value, type, ex);
 
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new IllegalStateException(ex);
         }
 
-        throw new ArgumentFormatException(value, type, "Cannot parse argument type: " + type);
+        throw new ArgumentFormatException(value, type);
     }
 
 

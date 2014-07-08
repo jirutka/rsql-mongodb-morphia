@@ -23,6 +23,7 @@
  */
 package cz.jirutka.rsql.mongodb.morphia;
 
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 
 public class SpringConversionServiceAdapter extends AbstractStringConverter {
@@ -41,7 +42,12 @@ public class SpringConversionServiceAdapter extends AbstractStringConverter {
         if (targetType == String.class) {
             return (T) value;
         }
-        return conversionService.convert(value, targetType);
+        try {
+            return conversionService.convert(value, targetType);
+
+        } catch (ConversionFailedException ex) {
+            throw new ArgumentFormatException(value, targetType, ex);
+        }
     }
 
 }
