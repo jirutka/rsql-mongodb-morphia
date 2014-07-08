@@ -2,15 +2,20 @@ package cz.jirutka.rsql.mongodb.morphia;
 
 import cz.jirutka.rsql.mongodb.morphia.internal.MappedFieldPath;
 import cz.jirutka.rsql.mongodb.morphia.internal.MappedFieldPathResolver;
+import cz.jirutka.rsql.mongodb.morphia.internal.SimpleCriteriaContainer;
 import cz.jirutka.rsql.mongodb.morphia.internal.SimpleFieldCriteria;
 import cz.jirutka.rsql.mongodb.parser.AllNode;
 import cz.jirutka.rsql.mongodb.parser.NoArgMongoRSQLVisitorAdapter;
 import cz.jirutka.rsql.parser.ast.*;
 import net.jcip.annotations.ThreadSafe;
 import org.mongodb.morphia.mapping.Mapper;
-import org.mongodb.morphia.query.*;
+import org.mongodb.morphia.query.Criteria;
+import org.mongodb.morphia.query.CriteriaContainer;
+import org.mongodb.morphia.query.CriteriaJoin;
+import org.mongodb.morphia.query.FilterOperator;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import static org.mongodb.morphia.query.CriteriaJoin.AND;
 import static org.mongodb.morphia.query.CriteriaJoin.OR;
@@ -58,11 +63,11 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
 
 
     public Criteria visit(AndNode node) {
-        return createContainer(node, AND);
+        return joinChildrenNodesInContainer(node, AND);
     }
 
     public Criteria visit(OrNode node) {
-        return createContainer(node, OR);
+        return joinChildrenNodesInContainer(node, OR);
     }
 
     public Criteria visit(EqualNode node) {
@@ -108,38 +113,65 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
      * @param node The comparison node to extract selector and argument from.
      * @param operator The (Morphia) operator to create criteria for.
      * @return A field criteria for the given comparison.
+     *
      * @throws RSQLValidationException If the node contains more or less than
      *         one argument, or a matching field for the selector cannot be found.
      */
-    protected AbstractCriteria createCriteria(ComparisonNode node, FilterOperator operator) {
+    protected Criteria createCriteria(ComparisonNode node, FilterOperator operator) {
 
-        if (!isMultiValuesFilter(operator) && node.getArguments().size() != 1) {
-            throw new RSQLValidationException("Single argument excepted, but got: " + node.getArguments());
-        }
-        MappedFieldPath mfp = fieldPathResolver.resolveFieldPath(node.getSelector(), entityClass);
-
-        Object value = isMultiValuesFilter(operator)
-                ? converter.convert(node.getArguments(), mfp.getTargetValueType())
-                : converter.convert(node.getArguments().get(0), mfp.getTargetValueType());
-
-        Object mappedValue = mapper.toMongoObject(mfp.getMappedField(), null, value);
+        MappedFieldPath mfp = resolveFieldPath(node.getSelector());
+        Object mappedValue = convertToMappedValue(node.getArguments(), mfp, isSingleValueFilter(operator));
 
         return new SimpleFieldCriteria(mfp.getFieldPath(), operator, mappedValue);
     }
 
+    /**
+     * Resolves a mapped field path.
+     *
+     * @throws RSQLValidationException If the field does not exists or invalid use
+     *         of dot notation.
+     */
+    protected MappedFieldPath resolveFieldPath(String selector) {
+        return fieldPathResolver.resolveFieldPath(selector, entityClass);
+    }
 
-    private Criteria createContainer(LogicalNode node, CriteriaJoin cj) {
+    /**
+     * Converts the argument(s) to the target type (specified by {@code
+     * MappedFieldPath}) and then to a Mongo object.
+     *
+     * @param arguments Single or multiple arguments in a list.
+     * @param mfp The mapped field path.
+     * @param singleValue Whether a single argument is expected.
+     * @return An argument(s) converted to Mongo value.
+     *
+     * @throws RSQLValidationException if single argument was expected, but
+     *         given none or multiple
+     * @throws cz.jirutka.rsql.mongodb.morphia.RSQLArgumentFormatException
+     */
+    protected Object convertToMappedValue(List<String> arguments, MappedFieldPath mfp, boolean singleValue) {
 
-        CriteriaContainer parent = new CriteriaContainerImpl(cj) {
-            // subclass is needed just to access the protected constructor.
-        };
+        if (singleValue && arguments.size() != 1) {
+            throw new RSQLValidationException("Single argument excepted, but got: " + arguments);
+        }
+
+        Object value = singleValue
+                ? converter.convert(arguments.get(0), mfp.getTargetValueType())
+                : converter.convert(arguments, mfp.getTargetValueType());
+
+        return mapper.toMongoObject(mfp.getMappedField(), null, value);
+    }
+
+
+    private Criteria joinChildrenNodesInContainer(LogicalNode node, CriteriaJoin cj) {
+
+        CriteriaContainer parent = new SimpleCriteriaContainer(cj);
         for (Node child : node) {
             parent.add( child.accept(this) );
         }
         return parent;
     }
 
-    private boolean isMultiValuesFilter(FilterOperator operator) {
-        return EnumSet.of(IN, NOT_IN, ALL).contains(operator);
+    private boolean isSingleValueFilter(FilterOperator operator) {
+        return ! EnumSet.of(IN, NOT_IN, ALL).contains(operator);
     }
 }
