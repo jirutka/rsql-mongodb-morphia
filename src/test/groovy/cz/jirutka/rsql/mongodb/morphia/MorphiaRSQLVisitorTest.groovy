@@ -1,15 +1,13 @@
 package cz.jirutka.rsql.mongodb.morphia
 
 import cz.jirutka.rsql.mongodb.morphia.fixtures.RootEntity
-import cz.jirutka.rsql.mongodb.parser.MongoRSQLNodesFactory
 import cz.jirutka.rsql.parser.RSQLParser
-import cz.jirutka.rsql.parser.ast.ComparisonOp
 import org.mongodb.morphia.query.FieldCriteria
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.mongodb.morphia.query.FilterOperator.*
+import static cz.jirutka.rsql.mongodb.morphia.MongoRSQLOperators.mongoOperators
 
 class MorphiaRSQLVisitorTest extends Specification {
 
@@ -23,43 +21,6 @@ class MorphiaRSQLVisitorTest extends Specification {
     def query = dataStore.createQuery(RootEntity)
     def visitor = new MorphiaRSQLVisitor(RootEntity, dataStore.mapper, fakeConverter)
 
-
-    @Unroll
-    def 'should map operator: #rsqlOperator'() {
-        setup:
-            def args = mongoOperator in [IN, NOT_IN, ALL] ? ['x', 'y'] : 'x'
-            def rootNode = new MongoRSQLNodesFactory().createComparisonNode(rsqlOperator.toString(), 'a', args)
-        and:
-            def expected = dataStore.createQuery(RootEntity)
-            expected.and(fieldCriteria('a', mongoOperator, args))
-        when:
-            query.and( rootNode.accept(visitor) )
-        then:
-            query.queryObject == expected.queryObject
-        where:
-            rsqlOperator     | mongoOperator
-            ComparisonOp.EQ  | EQUAL
-            ComparisonOp.NE  | NOT_EQUAL
-            ComparisonOp.GT  | GREATER_THAN
-            ComparisonOp.GE  | GREATER_THAN_OR_EQUAL
-            ComparisonOp.LT  | LESS_THAN
-            ComparisonOp.LE  | LESS_THAN_OR_EQUAL
-            ComparisonOp.IN  | IN
-            ComparisonOp.OUT | NOT_IN
-            '=all='          | ALL
-    }
-
-    @Unroll
-    def 'throw RSQLValidationException when multiple arguments given to: #operator'() {
-        setup:
-            def rootNode = parse("a${operator}(x,y)")
-        when:
-            query.and( rootNode.accept(visitor) )
-        then:
-            thrown RSQLValidationException
-        where:
-            operator << ComparisonOp.values() - [ComparisonOp.IN, ComparisonOp.OUT]
-    }
 
     def 'throw RSQLValidationException when field could not be found'() {
         setup:
@@ -143,6 +104,6 @@ class MorphiaRSQLVisitorTest extends Specification {
     }
 
     def parse(String rsql) {
-        new RSQLParser(new MongoRSQLNodesFactory()).parse(rsql)
+        new RSQLParser(mongoOperators()).parse(rsql)
     }
 }

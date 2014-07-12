@@ -23,7 +23,6 @@
  */
 package cz.jirutka.rsql.mongodb.morphia;
 
-import cz.jirutka.rsql.mongodb.parser.MongoRSQLNodesFactory;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.RSQLParserException;
 import cz.jirutka.rsql.parser.ast.Node;
@@ -44,7 +43,7 @@ public class MorphiaRSQLImpl implements MorphiaRSQL {
     private StringConverter converter = new DefaultStringConverter();
 
     @Getter @Setter
-    private RSQLParser rsqlParser = new RSQLParser(new MongoRSQLNodesFactory());
+    private RSQLParser rsqlParser = new RSQLParser(MongoRSQLOperators.mongoOperators());
 
     // lazy initialized
     private Mapper mapper;
@@ -86,7 +85,7 @@ public class MorphiaRSQLImpl implements MorphiaRSQL {
     private Mapper getMapper() {
         if (mapper == null) {
             if (! (datastore instanceof DatastoreImpl)) {
-                throw new IllegalStateException("datestore is not instance of DatastoreImpl");
+                throw new IllegalStateException("datastore is not instance of DatastoreImpl");
             }
             mapper = ((DatastoreImpl) datastore).getMapper();
         }

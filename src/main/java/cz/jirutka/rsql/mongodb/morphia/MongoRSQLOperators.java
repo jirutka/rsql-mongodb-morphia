@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013-2014 Czech Technical University in Prague.
+ * Copyright 2013-2014 Jakub Jirutka <jakub@jirutka.cz>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,24 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package cz.jirutka.rsql.mongodb.parser;
+package cz.jirutka.rsql.mongodb.morphia;
 
-import cz.jirutka.rsql.parser.ast.ComparisonNode;
-import cz.jirutka.rsql.parser.ast.RSQLVisitor;
+import cz.jirutka.rsql.parser.ast.ComparisonOperator;
+import cz.jirutka.rsql.parser.ast.RSQLOperators;
 
-import java.util.List;
+import java.util.Set;
 
-public class AllNode extends ComparisonNode {
+public abstract class MongoRSQLOperators extends RSQLOperators {
 
-    public AllNode(String selector, List<String> arguments) {
-        super(selector, arguments);
-    }
+    public static final ComparisonOperator ALL = new ComparisonOperator("=all=", true);
 
-    public String getOperator() {
-        return "=all=";
-    }
 
-    public <R, A> R accept(RSQLVisitor<R, A> visitor, A param) {
-        return ((MongoRSQLVisitor<R, A>) visitor).visit(this, param);
+    public static Set<ComparisonOperator> mongoOperators() {
+        Set<ComparisonOperator> set = defaultOperators();
+        set.add(ALL);
+        return set;
     }
 }

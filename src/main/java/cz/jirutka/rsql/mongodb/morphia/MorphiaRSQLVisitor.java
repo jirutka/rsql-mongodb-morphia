@@ -4,8 +4,6 @@ import cz.jirutka.rsql.mongodb.morphia.internal.MappedFieldPath;
 import cz.jirutka.rsql.mongodb.morphia.internal.MappedFieldPathResolver;
 import cz.jirutka.rsql.mongodb.morphia.internal.SimpleCriteriaContainer;
 import cz.jirutka.rsql.mongodb.morphia.internal.SimpleFieldCriteria;
-import cz.jirutka.rsql.mongodb.parser.AllNode;
-import cz.jirutka.rsql.mongodb.parser.NoArgMongoRSQLVisitorAdapter;
 import cz.jirutka.rsql.parser.ast.*;
 import net.jcip.annotations.ThreadSafe;
 import org.mongodb.morphia.mapping.Mapper;
@@ -14,12 +12,12 @@ import org.mongodb.morphia.query.CriteriaContainer;
 import org.mongodb.morphia.query.CriteriaJoin;
 import org.mongodb.morphia.query.FilterOperator;
 
-import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mongodb.morphia.query.CriteriaJoin.AND;
 import static org.mongodb.morphia.query.CriteriaJoin.OR;
-import static org.mongodb.morphia.query.FilterOperator.*;
 
 /**
  * Implementation of {@link cz.jirutka.rsql.parser.ast.RSQLVisitor} that
@@ -27,7 +25,20 @@ import static org.mongodb.morphia.query.FilterOperator.*;
  * MongoDB/Morphia {@link Criteria}.
  */
 @ThreadSafe
-public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
+public class MorphiaRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
+
+    @SuppressWarnings("unchecked")
+    private static final Map<ComparisonOperator, FilterOperator> OPERATORS_MAP = new HashMap() {{
+            put( MongoRSQLOperators.EQUAL,                 FilterOperator.EQUAL                 );
+            put( MongoRSQLOperators.IN,                    FilterOperator.IN                    );
+            put( MongoRSQLOperators.GREATER_THAN_OR_EQUAL, FilterOperator.GREATER_THAN_OR_EQUAL );
+            put( MongoRSQLOperators.GREATER_THAN,          FilterOperator.GREATER_THAN          );
+            put( MongoRSQLOperators.LESS_THAN_OR_EQUAL,    FilterOperator.LESS_THAN_OR_EQUAL    );
+            put( MongoRSQLOperators.LESS_THAN,             FilterOperator.LESS_THAN             );
+            put( MongoRSQLOperators.NOT_EQUAL,             FilterOperator.NOT_EQUAL             );
+            put( MongoRSQLOperators.NOT_IN,                FilterOperator.NOT_IN                );
+            put( MongoRSQLOperators.ALL,                   FilterOperator.ALL                   );
+    }};
 
     private final Class<?> entityClass;
 
@@ -70,40 +81,8 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
         return joinChildrenNodesInContainer(node, OR);
     }
 
-    public Criteria visit(EqualNode node) {
-        return createCriteria(node, EQUAL);
-    }
-
-    public Criteria visit(InNode node) {
-        return createCriteria(node, IN);
-    }
-
-    public Criteria visit(GreaterThanOrEqualNode node) {
-        return createCriteria(node, GREATER_THAN_OR_EQUAL);
-    }
-
-    public Criteria visit(GreaterThanNode node) {
-        return createCriteria(node, GREATER_THAN);
-    }
-
-    public Criteria visit(LessThanOrEqualNode node) {
-        return createCriteria(node, LESS_THAN_OR_EQUAL);
-    }
-
-    public Criteria visit(LessThanNode node) {
-        return createCriteria(node, LESS_THAN);
-    }
-
-    public Criteria visit(NotEqualNode node) {
-        return createCriteria(node, NOT_EQUAL);
-    }
-
-    public Criteria visit(NotInNode node) {
-        return createCriteria(node, NOT_IN);
-    }
-
-    public Criteria visit(AllNode node) {
-        return createCriteria(node, ALL);
+    public Criteria visit(ComparisonNode node) {
+        return createCriteria(node, OPERATORS_MAP.get(node.getOperator()));
     }
 
 
@@ -120,7 +99,7 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
     protected Criteria createCriteria(ComparisonNode node, FilterOperator operator) {
 
         MappedFieldPath mfp = resolveFieldPath(node.getSelector());
-        Object mappedValue = convertToMappedValue(node.getArguments(), mfp, isSingleValueFilter(operator));
+        Object mappedValue = convertToMappedValue(node.getArguments(), mfp, !node.getOperator().isMultiValue());
 
         return new SimpleFieldCriteria(mfp.getFieldPath(), operator, mappedValue);
     }
@@ -144,15 +123,9 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
      * @param singleValue Whether a single argument is expected.
      * @return An argument(s) converted to Mongo value.
      *
-     * @throws RSQLValidationException if single argument was expected, but
-     *         given none or multiple
      * @throws cz.jirutka.rsql.mongodb.morphia.RSQLArgumentFormatException
      */
     protected Object convertToMappedValue(List<String> arguments, MappedFieldPath mfp, boolean singleValue) {
-
-        if (singleValue && arguments.size() != 1) {
-            throw new RSQLValidationException("Single argument excepted, but got: " + arguments);
-        }
 
         Object value = singleValue
                 ? converter.convert(arguments.get(0), mfp.getTargetValueType())
@@ -169,9 +142,5 @@ public class MorphiaRSQLVisitor extends NoArgMongoRSQLVisitorAdapter<Criteria> {
             parent.add( child.accept(this) );
         }
         return parent;
-    }
-
-    private boolean isSingleValueFilter(FilterOperator operator) {
-        return ! EnumSet.of(IN, NOT_IN, ALL).contains(operator);
     }
 }
