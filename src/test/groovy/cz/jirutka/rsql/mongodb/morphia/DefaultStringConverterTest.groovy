@@ -23,24 +23,25 @@
  */
 package cz.jirutka.rsql.mongodb.morphia
 
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
 @Unroll
 class DefaultStringConverterTest extends Specification {
 
-    static final DateTimeZone UTC = DateTimeZone.forOffsetHours(0)
-    static final DateTimeZone CET = DateTimeZone.forOffsetHours(1)
-    static final DateTimeZone GMT9 = DateTimeZone.forOffsetHours(9)
+    static final ZoneId UTC = ZoneId.of("UTC")
+    static final ZoneId CET = ZoneId.of("CET")
+    static final ZoneId GMT9 = ZoneId.of("GMT+9")
 
     def converter = new DefaultStringConverter()
 
     static {
-        TimeZone.setDefault(TimeZone.getTimeZone('CET'))
+        TimeZone.setDefault(TimeZone.getTimeZone(CET))
     }
 
 
@@ -80,10 +81,10 @@ class DefaultStringConverterTest extends Specification {
             converter.convert(value, Date) == expected
         where:
             value                       | expected
-            '1989-11-17'                | new DateTime(1989, 11, 17, 0, 0).toDate()
-            '2014-03-17T15:30:42'       | new DateTime(2014, 3, 17, 15, 30, 42, CET).toDate()
-            '2014-03-17T15:30:42Z'      | new DateTime(2014, 3, 17, 15, 30, 42, UTC).toDate()
-            '2014-03-17T15:30:42+09:00' | new DateTime(2014, 3, 17, 15, 30, 42, GMT9).toDate()
+            '1989-11-17'                | Date.from(ZonedDateTime.of(1989, 11, 17, 0, 0, 0, 0, ZoneId.systemDefault()).toInstant())
+            '2014-03-17T15:30:42'       | Date.from(ZonedDateTime.of(2014, 3, 17, 15, 30, 42, 0, CET).toInstant())
+            '2014-03-17T15:30:42Z'      | Date.from(ZonedDateTime.of(2014, 3, 17, 15, 30, 42, 0, UTC).toInstant())
+            '2014-03-17T15:30:42+09:00' | Date.from(ZonedDateTime.of(2014, 3, 17, 15, 30, 42, 0, GMT9).toInstant())
     }
 
     def 'parse using valueOf() method'() {
