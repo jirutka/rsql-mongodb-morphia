@@ -58,6 +58,11 @@
         <url>https://travis-ci.org/marchev/rsql-mongodb-springdata</url>
     </ciManagement>
 
+    <!--//////////////////// PROPERTIES //////////////////////-->
+
+    <properties>
+        <spring.version>4.1.5.RELEASE</spring.version>
+    </properties>
 
     <!--//////////////////// DEPENDENCIES ////////////////////-->
 
@@ -77,7 +82,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>[3.0.0.RELEASE,)</version>
+            <version>${spring.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
             <exclusions>
@@ -98,7 +103,7 @@
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
-            <version>0.7-groovy-2.0</version>
+            <version>1.0-groovy-2.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.codehaus.groovy</groupId>
