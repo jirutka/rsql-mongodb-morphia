@@ -26,50 +26,31 @@ package org.marchev.rsql.mongodb.springdata;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.RSQLParserException;
 import cz.jirutka.rsql.parser.ast.Node;
-import lombok.Getter;
-import lombok.Setter;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.DatastoreImpl;
-import org.mongodb.morphia.mapping.Mapper;
-import org.mongodb.morphia.query.Criteria;
-import org.mongodb.morphia.query.Query;
+import org.marchev.rsql.mongodb.springdata.exception.RSQLException;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-public class MorphiaRSQLImpl implements MorphiaRSQL {
+public class MongoRSQLImpl implements MongoRSQL {
 
-    @Getter
-    private final Datastore datastore;
+    private ConversionService conversionService;
 
-    @Getter @Setter
-    private StringConverter converter = new DefaultStringConverter();
-
-    @Getter @Setter
     private RSQLParser rsqlParser = new RSQLParser(MongoRSQLOperators.mongoOperators());
 
-    // lazy initialized
-    private Mapper mapper;
-
-
-    public MorphiaRSQLImpl(Datastore datastore) {
-        this.datastore = datastore;
+    public MongoRSQLImpl(ConversionService conversionService) {
+        this.conversionService = conversionService;
     }
 
 
     public Criteria createCriteria(String rsql, Class<?> entityClass) {
-
         Node rootNode = parse(rsql);
-
-        MorphiaRSQLVisitor visitor = new MorphiaRSQLVisitor(entityClass, getMapper(), converter);
-
+        MongoRSQLVisitor visitor = new MongoRSQLVisitor(entityClass, conversionService);
         return rootNode.accept(visitor);
     }
 
-    public <T> Query<T> createQuery(String rsql, Class<T> entityClass) {
-
-        Query<T> query = datastore.createQuery(entityClass);
-
-        query.and(createCriteria(rsql, entityClass));
-
-        return query;
+    public Query createQuery(String rsql, Class<?> entityClass) {
+        Criteria criteria = createCriteria(rsql, entityClass);
+        return new Query(criteria);
     }
 
 
@@ -80,15 +61,5 @@ public class MorphiaRSQLImpl implements MorphiaRSQL {
         } catch (RSQLParserException ex) {
             throw new RSQLException(ex);
         }
-    }
-
-    private Mapper getMapper() {
-        if (mapper == null) {
-            if (! (datastore instanceof DatastoreImpl)) {
-                throw new IllegalStateException("datastore is not instance of DatastoreImpl");
-            }
-            mapper = ((DatastoreImpl) datastore).getMapper();
-        }
-        return mapper;
     }
 }

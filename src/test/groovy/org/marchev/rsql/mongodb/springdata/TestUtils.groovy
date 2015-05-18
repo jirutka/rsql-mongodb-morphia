@@ -24,12 +24,11 @@
 package org.marchev.rsql.mongodb.springdata
 
 import com.github.fakemongo.Fongo
-import org.mongodb.morphia.Datastore
-import org.mongodb.morphia.Morphia
+import org.springframework.data.mongodb.core.MongoTemplate
 
 abstract class TestUtils {
 
-    static Datastore createDatastore() {
-        new Morphia().createDatastore(new Fongo('test').mongo, 'testdb')
+    static MongoTemplate createMongoTemplate() {
+        return new MongoTemplate(new Fongo('test').mongo, "testdb");
     }
 }

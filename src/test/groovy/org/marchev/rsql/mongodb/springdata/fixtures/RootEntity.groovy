@@ -23,9 +23,9 @@
  */
 package org.marchev.rsql.mongodb.springdata.fixtures
 
-import org.mongodb.morphia.annotations.Id
-import org.mongodb.morphia.annotations.Property
-import org.mongodb.morphia.annotations.Reference
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.DBRef
+import org.springframework.data.mongodb.core.mapping.Field
 
 class RootEntity {
 
@@ -38,9 +38,9 @@ class RootEntity {
     List<ChildEntity> actors
     ChildEntity director
 
-    @Reference(lazy=true)
+    @DBRef(lazy=true)
     RootEntity parent
 
-    @Property('name')
+    @Field('name')
     String title
 }

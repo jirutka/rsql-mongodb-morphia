@@ -21,33 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.rsql.mongodb.springdata;
+package org.marchev.rsql.mongodb.springdata.exception;
 
-import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.core.convert.ConversionService;
+public class RSQLValidationException extends RSQLException {
 
-public class SpringConversionServiceAdapter extends AbstractStringConverter {
-
-    private final ConversionService conversionService;
-
-
-    public SpringConversionServiceAdapter(ConversionService conversionService) {
-        this.conversionService = conversionService;
+    public RSQLValidationException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-
-    @SuppressWarnings("unchecked")
-    public <T> T convert(String value, Class<T> targetType) {
-
-        if (targetType == String.class) {
-            return (T) value;
-        }
-        try {
-            return conversionService.convert(value, targetType);
-
-        } catch (ConversionFailedException ex) {
-            throw new RSQLArgumentFormatException(value, targetType, ex);
-        }
+    public RSQLValidationException(String message) {
+        super(message);
     }
-
 }

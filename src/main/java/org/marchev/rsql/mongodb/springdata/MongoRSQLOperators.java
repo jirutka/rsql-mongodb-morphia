@@ -32,7 +32,6 @@ public abstract class MongoRSQLOperators extends RSQLOperators {
 
     public static final ComparisonOperator ALL = new ComparisonOperator("=all=", true);
 
-
     public static Set<ComparisonOperator> mongoOperators() {
         Set<ComparisonOperator> set = defaultOperators();
         set.add(ALL);

@@ -27,30 +27,30 @@ import spock.lang.Specification
 
 class AbstractStringConverterTest extends Specification {
 
-    private converter = Spy(AbstractStringConverter)
-
-
-    def 'convert collection of values'() {
-        given:
-            def values = ['123', '456', '789']
-        when:
-            def result = converter.convert(values, Integer)
-        then:
-            values.each { val ->
-                1 * converter.convert(_ as String, Integer) >> { src -> val.toInteger() }
-            }
-        and:
-           result == values*.toInteger()
-    }
-
-    def 'return collection of values unchanged when String'() {
-        given:
-            def values = ['chunky', 'bacon', 'here!']
-        when:
-            def result = converter.convert(values, String)
-        then:
-            0 * converter.convert(_ as String, Integer)
-        and:
-            result == values
-    }
+//    private converter = Spy(AbstractStringConverter)
+//
+//
+//    def 'convert collection of values'() {
+//        given:
+//            def values = ['123', '456', '789']
+//        when:
+//            def result = converter.convert(values, Integer)
+//        then:
+//            values.each { val ->
+//                1 * converter.convert(_ as String, Integer) >> { src -> val.toInteger() }
+//            }
+//        and:
+//           result == values*.toInteger()
+//    }
+//
+//    def 'return collection of values unchanged when String'() {
+//        given:
+//            def values = ['chunky', 'bacon', 'here!']
+//        when:
+//            def result = converter.convert(values, String)
+//        then:
+//            0 * converter.convert(_ as String, Integer)
+//        and:
+//            result == values
+//    }
 }

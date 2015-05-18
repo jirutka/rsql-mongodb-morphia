@@ -21,23 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.rsql.mongodb.springdata;
+package org.marchev.rsql.mongodb.springdata.exception;
 
-import java.util.Collection;
+public class RSQLArgumentFormatException extends RSQLException {
 
-public interface StringConverter {
+    private final String value;
+    private final Class<?> targetType;
 
-    /**
-     * Convert the given {@code String} to targetType.
-     *
-     * @throws RSQLArgumentFormatException if a conversion exception occurred.
-     */
-    <T> T convert(String value, Class<T> targetType);
 
-    /**
-     * Convert {@code String} values from the given collection to the targetType.
-     *
-     * @throws RSQLArgumentFormatException if a conversion exception occurred.
-     */
-    <T> Collection<? extends T> convert(Collection<String> source, Class<T> targetType);
+    public RSQLArgumentFormatException(String value, Class<?> targetType, Throwable cause) {
+        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()), cause);
+        this.value = value;
+        this.targetType = targetType;
+    }
+
+    public RSQLArgumentFormatException(String value, Class<?> targetType) {
+        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()));
+        this.value = value;
+        this.targetType = targetType;
+    }
 }

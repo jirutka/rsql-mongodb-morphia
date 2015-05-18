@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013-2014 Jakub Jirutka <jakub@jirutka.cz>.
+ * Copyright 2013-2014 Czech Technical University in Prague.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.rsql.mongodb.springdata.internal;
+package org.marchev.rsql.mongodb.springdata;
 
-import org.mongodb.morphia.query.Criteria;
-import org.mongodb.morphia.query.CriteriaContainerImpl;
-import org.mongodb.morphia.query.CriteriaJoin;
 
-import java.util.Collection;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-/**
- * Subclass of {@link CriteriaContainerImpl} needed just to access the
- * protected constructor.
- */
-public class SimpleCriteriaContainer extends CriteriaContainerImpl {
+public interface MongoRSQL {
 
-    public SimpleCriteriaContainer(CriteriaJoin joinMethod) {
-        super(joinMethod);
-    }
+    Criteria createCriteria(String rsql, Class<?> entityClass);
 
-    public SimpleCriteriaContainer(CriteriaJoin joinMethod, Collection<? extends Criteria> children) {
-        super(joinMethod);
-        add(children.toArray(new Criteria[children.size()]));
-    }
+    Query createQuery(String rsql, Class<?> entityClass);
 }

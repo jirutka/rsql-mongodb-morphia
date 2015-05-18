@@ -21,15 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.rsql.mongodb.springdata;
+package org.marchev.rsql.mongodb.springdata.exception;
 
-public class RSQLValidationException extends RSQLException {
+public class RSQLException extends RuntimeException {
 
-    public RSQLValidationException(String message, Throwable cause) {
+    public RSQLException(String message) {
+        super(message);
+    }
+
+    public RSQLException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public RSQLValidationException(String message) {
-        super(message);
+    public RSQLException(Throwable cause) {
+        super(cause);
     }
 }

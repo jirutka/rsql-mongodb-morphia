@@ -1,25 +1,27 @@
 package org.marchev.rsql.mongodb.springdata
 
-import org.marchev.rsql.mongodb.springdata.fixtures.RootEntity
 import cz.jirutka.rsql.parser.RSQLParser
-import org.mongodb.morphia.query.FieldCriteria
+import org.marchev.rsql.mongodb.springdata.exception.RSQLValidationException
+import org.marchev.rsql.mongodb.springdata.fixtures.RootEntity
+import org.springframework.core.convert.ConversionService
+import org.springframework.data.mongodb.core.query.Query
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static MongoRSQLOperators.mongoOperators
 
-class MorphiaRSQLVisitorTest extends Specification {
+class MongoRSQLVisitorTest extends Specification {
 
-    @Shared dataStore = TestUtils.createDatastore()
+    @Shared mongoTemplate = TestUtils.createMongoTemplate()
 
-    // Fake converter that returns the source value
-    def fakeConverter = Stub(StringConverter) {
+    // Fake ConversionService that returns the source value
+    def fakeConverter = Stub(ConversionService) {
         convert(_, _) >> { val, type -> val }
     }
 
-    def query = dataStore.createQuery(RootEntity)
-    def visitor = new MorphiaRSQLVisitor(RootEntity, dataStore.mapper, fakeConverter)
+    def query = new Query()
+    def visitor = new MongoRSQLVisitor(RootEntity, fakeConverter)
 
 
     def 'throw RSQLValidationException when field could not be found'() {
@@ -34,7 +36,7 @@ class MorphiaRSQLVisitorTest extends Specification {
     def 'convert argument value through Converter'() {
         setup:
             def converter = Mock(StringConverter)
-            def visitor = new MorphiaRSQLVisitor(RootEntity, dataStore.mapper, converter)
+            def visitor = new MongoRSQLVisitor(RootEntity, mongoTemplate.mapper, converter)
 
         when:
             parse('year==2014').accept(visitor)
@@ -91,16 +93,16 @@ class MorphiaRSQLVisitorTest extends Specification {
     }
 
 
-    //////// Helpers ////////
+    ////// Helpers ////////
 
     def query(Closure c) {
-        def query = dataStore.createQuery(RootEntity)
+        def query = mongoTemplate.createQuery(RootEntity)
         c.call(query)
         query
     }
 
     def fieldCriteria(field, operator, value) {
-        new FieldCriteria(dataStore.createQuery(RootEntity), field, operator, value, false, false)
+        new FieldCriteria(mongoTemplate.createQuery(RootEntity), field, operator, value, false, false)
     }
 
     def parse(String rsql) {
