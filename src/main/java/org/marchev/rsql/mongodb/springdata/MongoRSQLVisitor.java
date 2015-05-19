@@ -30,22 +30,16 @@ public class MongoRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
             put( MongoRSQLOperators.ALL,                   (f, v)-> { return Criteria.where(f).all(v);      });
     }};
 
-    private final Class<?> entityClass;
-
     private final ConversionService converter;
 
     private Criteria criteria;
 
     /**
-     * Creates a new instance of {@code MongoRSQLVisitor} for the specified
-     * entity class.
+     * Creates a new instance of {@code MongoRSQLVisitor}.
      *
-     * @param entityClass A class of the {@link org.mongodb.morphia.annotations.Entity Entity}
-     *                    to create a {@link Criteria} for.
      * @param converter A ConversionService implementation to be used.
      */
-    public MongoRSQLVisitor(Class<?> entityClass, ConversionService converter) {
-        this.entityClass = entityClass;
+    public MongoRSQLVisitor(ConversionService converter) {
         this.converter = converter;
         this.criteria = new Criteria();
     }

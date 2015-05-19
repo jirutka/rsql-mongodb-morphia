@@ -42,14 +42,14 @@ public class MongoRSQLImpl implements MongoRSQL {
     }
 
 
-    public Criteria createCriteria(String rsql, Class<?> entityClass) {
+    public Criteria createCriteria(String rsql) {
         Node rootNode = parse(rsql);
-        MongoRSQLVisitor visitor = new MongoRSQLVisitor(entityClass, conversionService);
+        MongoRSQLVisitor visitor = new MongoRSQLVisitor(conversionService);
         return rootNode.accept(visitor);
     }
 
-    public Query createQuery(String rsql, Class<?> entityClass) {
-        Criteria criteria = createCriteria(rsql, entityClass);
+    public Query createQuery(String rsql) {
+        Criteria criteria = createCriteria(rsql);
         return new Query(criteria);
     }
 

@@ -29,7 +29,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 public interface MongoRSQL {
 
-    Criteria createCriteria(String rsql, Class<?> entityClass);
+    Criteria createCriteria(String rsql);
 
-    Query createQuery(String rsql, Class<?> entityClass);
+    Query createQuery(String rsql);
 }
