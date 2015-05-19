@@ -47,21 +47,25 @@ class MongoRSQLVisitorTest extends Specification {
 //    }
 //
 //
-//    @Unroll
-//    def 'convert complex RSQL to Mongo query: #rsql'() {
-//        setup:
-//            def rootNode = parse(rsql)
-//        when:
-//            query.and( rootNode.accept(visitor) )
-//        then:
-//            query.queryObject == expected
-//        where:
-//            rsql                    | expected
+
+    @Unroll
+    def 'convert complex RSQL to Mongo query: #rsql'() {
+        setup:
+            def rootNode = parse(rsql)
+        when:
+            def criteria = rootNode.accept(visitor)
+        then:
+            criteria != null
+            mongoTemplate.executeCommand(rsql) == expected
+            // query.queryObject == expected
+        where:
+            rsql                    | expected
+            'a==b'                  | [ a: 'b' ]
 //            'a==u;b==v;c!=w'        | [ a:'u', b:'v', c: [ $ne:'w' ] ]
 //            'a=gt=u;a=lt=v;c==w'    | [ $and: [ [a:[$gt:'u']], [a:[$lt:'v']], [c:'w']] ]
 //            'a==u,b==v;c==w,d==x'   | [ $or: [ [a:'u'], [b:'v', c:'w'], [d:'x']] ]
 //            '(a=gt=u,a=le=v);c==d'  | [ $or: [[a:[$gt:'u']], [a:[$lte:'v']]], c:'d']
-//    }
+    }
 //
 //    @Unroll
 //    def 'convert RSQL to Mongo query when key is not the same as field name: #rsql'() {
