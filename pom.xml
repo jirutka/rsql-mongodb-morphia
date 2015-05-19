@@ -54,6 +54,7 @@
         <slf4j.version>1.7.7</slf4j.version>
         <groovyVersion>2.4.3</groovyVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <groovy-eclipse-compiler.version>2.9.2-01</groovy-eclipse-compiler.version>
     </properties>
 
     <!--//////////////////// DEPENDENCIES ////////////////////-->
@@ -144,33 +145,28 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
+                    <compilerId>groovy-eclipse-compiler</compilerId>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-compiler</artifactId>
+                        <version>${groovy-eclipse-compiler.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-batch</artifactId>
+                        <version>2.4.3-01</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>generate-test-sources</phase>
-                        <configuration>
-                            <target>
-                                <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc">
-                                    <classpath refid="maven.test.classpath" />
-                                </taskdef>
-                                <mkdir dir="${project.build.testOutputDirectory}" />
-                                <groovyc srcdir="${basedir}/src/test/groovy" destdir="${project.build.testOutputDirectory}" encoding="${project.build.sourceEncoding}">
-                                    <classpath refid="maven.test.classpath" />
-                                </groovyc>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-eclipse-compiler</artifactId>
+                <version>${groovy-eclipse-compiler.version}</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
