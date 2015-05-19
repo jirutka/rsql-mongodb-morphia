@@ -30,17 +30,17 @@ public class MongoRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
             put( MongoRSQLOperators.ALL,                   (f, v)-> { return Criteria.where(f).all(v);      });
     }};
 
-    private final ConversionService converter;
+    private final ConversionService conversionService;
 
     private Criteria criteria;
 
     /**
      * Creates a new instance of {@code MongoRSQLVisitor}.
      *
-     * @param converter A ConversionService implementation to be used.
+     * @param conversionService A ConversionService implementation to be used.
      */
-    public MongoRSQLVisitor(ConversionService converter) {
-        this.converter = converter;
+    public MongoRSQLVisitor(ConversionService conversionService) {
+        this.conversionService = conversionService;
         this.criteria = new Criteria();
     }
 
@@ -69,7 +69,16 @@ public class MongoRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
      */
     protected Criteria createCriteria(ComparisonNode node) {
         SimpleCriteriaOperator criteriaOperator = OPERATORS_MAP.get(node.getOperator());
-        return criteriaOperator.apply(node.getSelector(), criteriaOperator);
+        String criteriaArgs = extractArgumentsAsString(node);
+        return criteriaOperator.apply(node.getSelector(), criteriaArgs);
+    }
+
+    private String extractArgumentsAsString(ComparisonNode node) {
+        if (node.getArguments().size() == 1) {
+            return conversionService.convert(node.getArguments().get(0), String.class);
+        } else {
+            return conversionService.convert(node.getArguments(), String.class);
+        }
     }
 
 
