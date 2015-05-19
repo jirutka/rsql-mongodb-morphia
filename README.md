@@ -1,4 +1,4 @@
-RSQL for MongoDB - Morphia
+RSQL for Spring Data MongoDB
 ==========================
 [![Build Status](https://travis-ci.org/marchev/rsql-mongodb-springdata.png)](https://travis-ci.org/marchev/rsql-mongodb-springdata) [![Coverage Status](https://coveralls.io/repos/marchev/rsql-mongodb-springdata/badge.png?branch=master)](https://coveralls.io/r/marchev/rsql-mongodb-springdata?branch=master)
 
