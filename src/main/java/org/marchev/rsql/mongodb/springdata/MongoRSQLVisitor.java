@@ -3,7 +3,6 @@ package org.marchev.rsql.mongodb.springdata;
 import cz.jirutka.rsql.parser.ast.*;
 import net.jcip.annotations.ThreadSafe;
 import org.marchev.rsql.mongodb.springdata.exception.RSQLValidationException;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.HashMap;
@@ -18,29 +17,24 @@ import java.util.Map;
 public class MongoRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
 
     @SuppressWarnings("unchecked")
-    private static final Map<ComparisonOperator, SimpleCriteriaOperator> OPERATORS_MAP = new HashMap<ComparisonOperator, SimpleCriteriaOperator>() {{
-            put( MongoRSQLOperators.EQUAL,                 (f, v)-> { return Criteria.where(f).is(v);       });
-            put( MongoRSQLOperators.IN,                    (f, v)-> { return Criteria.where(f).in(v);       });
-            put( MongoRSQLOperators.GREATER_THAN_OR_EQUAL, (f, v)-> { return Criteria.where(f).gte(v);      });
-            put( MongoRSQLOperators.GREATER_THAN,          (f, v)-> { return Criteria.where(f).gt(v);       });
-            put( MongoRSQLOperators.LESS_THAN_OR_EQUAL,    (f, v)-> { return Criteria.where(f).lte(v);      });
-            put( MongoRSQLOperators.LESS_THAN,             (f, v)-> { return Criteria.where(f).lt(v);       });
-            put( MongoRSQLOperators.NOT_EQUAL,             (f, v)-> { return Criteria.where(f).ne(v);       });
-            put( MongoRSQLOperators.NOT_IN,                (f, v)-> { return Criteria.where(f).nin(v);      });
-            put( MongoRSQLOperators.ALL,                   (f, v)-> { return Criteria.where(f).all(v);      });
+    private static final Map<ComparisonOperator, CriteriaOperator> OPERATORS_MAP = new HashMap<ComparisonOperator, CriteriaOperator>() {{
+        put( MongoRSQLOperators.EQUAL,                 (criteria, arg)-> { return criteria.is(arg);  });
+        put( MongoRSQLOperators.GREATER_THAN_OR_EQUAL, (criteria, arg)-> { return criteria.gte(arg); });
+        put( MongoRSQLOperators.GREATER_THAN,          (criteria, arg)-> { return criteria.gt(arg);  });
+        put( MongoRSQLOperators.LESS_THAN_OR_EQUAL,    (criteria, arg)-> { return criteria.lte(arg); });
+        put( MongoRSQLOperators.LESS_THAN,             (criteria, arg)-> { return criteria.lt(arg);  });
+        put( MongoRSQLOperators.NOT_EQUAL,             (criteria, arg)-> { return criteria.ne(arg);  });
+        put( MongoRSQLOperators.IN,                    (criteria, arg)-> { return criteria.in(arg);  });
+        put( MongoRSQLOperators.NOT_IN,                (criteria, arg)-> { return criteria.nin(arg); });
+        put( MongoRSQLOperators.ALL,                   (criteria, arg)-> { return criteria.all(arg); });
     }};
-
-    private final ConversionService conversionService;
 
     private Criteria criteria;
 
     /**
      * Creates a new instance of {@code MongoRSQLVisitor}.
-     *
-     * @param conversionService A ConversionService implementation to be used.
      */
-    public MongoRSQLVisitor(ConversionService conversionService) {
-        this.conversionService = conversionService;
+    public MongoRSQLVisitor() {
         this.criteria = new Criteria();
     }
 
@@ -68,17 +62,17 @@ public class MongoRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
      *         one argument, or a matching field for the selector cannot be found.
      */
     protected Criteria createCriteria(ComparisonNode node) {
-        SimpleCriteriaOperator criteriaOperator = OPERATORS_MAP.get(node.getOperator());
-        String criteriaArgs = extractArgumentsAsString(node);
-        return criteriaOperator.apply(node.getSelector(), criteriaArgs);
+        Criteria criteria = new Criteria().where(extractCriteriaField(node));
+        CriteriaOperator criteriaOperator = OPERATORS_MAP.get(node.getOperator());
+        return criteriaOperator.apply(criteria, extractArguments(node));
     }
 
-    private String extractArgumentsAsString(ComparisonNode node) {
-        if (node.getArguments().size() == 1) {
-            return conversionService.convert(node.getArguments().get(0), String.class);
-        } else {
-            return conversionService.convert(node.getArguments(), String.class);
-        }
+    private String extractCriteriaField(ComparisonNode node) {
+            return node.getSelector();
+    }
+
+    private Object extractArguments(ComparisonNode node) {
+        return node.getArguments().size() == 1 ? node.getArguments().get(0) : node.getArguments().toArray();
     }
 
 

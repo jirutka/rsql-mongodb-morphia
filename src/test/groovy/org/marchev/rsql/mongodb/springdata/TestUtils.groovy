@@ -28,7 +28,7 @@ import org.springframework.data.mongodb.core.MongoTemplate
 
 abstract class TestUtils {
 
-    static MongoTemplate createMongoTemplate() {
+    static MongoTemplate createMongoOperations() {
         return new MongoTemplate(new Fongo('test').mongo, "testdb");
     }
 }

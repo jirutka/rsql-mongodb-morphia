@@ -27,24 +27,16 @@ import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.RSQLParserException;
 import cz.jirutka.rsql.parser.ast.Node;
 import org.marchev.rsql.mongodb.springdata.exception.RSQLException;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 public class MongoRSQLImpl implements MongoRSQL {
 
-    private ConversionService conversionService;
-
     private RSQLParser rsqlParser = new RSQLParser(MongoRSQLOperators.mongoOperators());
-
-    public MongoRSQLImpl(ConversionService conversionService) {
-        this.conversionService = conversionService;
-    }
-
 
     public Criteria createCriteria(String rsql) {
         Node rootNode = parse(rsql);
-        MongoRSQLVisitor visitor = new MongoRSQLVisitor(conversionService);
+        MongoRSQLVisitor visitor = new MongoRSQLVisitor();
         return rootNode.accept(visitor);
     }
 
@@ -57,7 +49,6 @@ public class MongoRSQLImpl implements MongoRSQL {
     protected Node parse(String rsql) {
         try {
             return rsqlParser.parse(rsql);
-
         } catch (RSQLParserException ex) {
             throw new RSQLException(ex);
         }

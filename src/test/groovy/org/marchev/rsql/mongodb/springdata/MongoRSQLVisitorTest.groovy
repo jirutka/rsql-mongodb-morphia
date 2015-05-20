@@ -1,105 +1,57 @@
 package org.marchev.rsql.mongodb.springdata
 
 import cz.jirutka.rsql.parser.RSQLParser
-import org.marchev.rsql.mongodb.springdata.exception.RSQLValidationException
-import org.marchev.rsql.mongodb.springdata.fixtures.RootEntity
-import org.springframework.core.convert.ConversionService
 import org.springframework.data.mongodb.core.query.Query
-import spock.lang.*
+import spock.lang.Shared
+import spock.lang.Specification
+import spock.lang.Unroll
 
 import static MongoRSQLOperators.mongoOperators
 
 class MongoRSQLVisitorTest extends Specification {
 
-    @Shared mongoTemplate = TestUtils.createMongoTemplate()
-
-    // Fake ConversionService that returns the source value
-    def conversionService = Stub(ConversionService) {
-        convert(_, _) >> { val, type -> val }
-    }
+    @Shared mongoOperations = TestUtils.createMongoOperations()
 
     def query = new Query()
-    def visitor = new MongoRSQLVisitor(conversionService)
+    def visitor = new MongoRSQLVisitor()
 
 
-    def 'throw RSQLValidationException when field could not be found'() {
-        given:
-            def rootNode = parse('illegal==666')
-        when:
-            rootNode.accept(visitor)
-        then:
-            thrown RSQLValidationException
-    }
+    // TODO: Throw RSQLValidationException when field could not be found
 
-//    def 'convert argument value through Converter'() {
-//        setup:
-//            def visitor = new MongoRSQLVisitor(conversionService)
-//
-//        when:
-//            parse('year==2014').accept(visitor)
-//        then:
-//            1 * conversionService.convert('2014', int)
-//
-//        when:
-//            parse('genres=in=(sci-fi,thriller)').accept(visitor)
-//        then:
-//           1 * conversionService.convert(['sci-fi', 'thriller'], String)
-//    }
-//
-//
+    // TODO: Add test which tests the selector conversions based on entity types.
 
     @Unroll
-    def 'convert complex RSQL to Mongo query: #rsql'() {
+    def 'RSQL operator to Mongo query: #rsql'() {
         setup:
             def rootNode = parse(rsql)
         when:
             def criteria = rootNode.accept(visitor)
         then:
             criteria != null
-            criteria.criteriaObject == expected
+            expected == criteria.criteriaObject
         where:
             rsql                    | expected
             'a==b'                  | [ a: 'b' ]
-            'a==u;b==v;c!=w'        | [ a:'u', b:'v', c: [ $ne:'w' ] ]
-            'a=gt=u;a=lt=v;c==w'    | [ $and: [ [a:[$gt:'u']], [a:[$lt:'v']], [c:'w']] ]
-            'a==u,b==v;c==w,d==x'   | [ $or: [ [a:'u'], [b:'v', c:'w'], [d:'x']] ]
-            '(a=gt=u,a=le=v);c==d'  | [ $or: [[a:[$gt:'u']], [a:[$lte:'v']]], c:'d']
+            'a!=b'                  | [ a: [ $ne:  'b']]
+            'a=gt=b'                | [ a: [ $gt:  'b']]
+            'a=ge=b'                | [ a: [ $gte: 'b']]
+            'a=lt=b'                | [ a: [ $lt:  'b']]
+            'a=le=b'                | [ a: [ $lte: 'b']]
+            'a=in=b'                | [ a: [ $in:  ['b']]]
+            'a=out=b'               | [ a: [ $nin: ['b']]]
+            'a=in=(a,b,c)'          | [ a: [ $in:  [['a', 'b','c']]]]
+            'a=out=(b,c)'           | [ a: [ $nin: [['b','c']]]]
+            'a=all=(x,y,z)'         | [ a: [ $all: [['x','y','z']]]]
     }
-//
-//    @Unroll
-//    def 'convert RSQL to Mongo query when key is not the same as field name: #rsql'() {
-//        setup:
-//            def rootNode = parse(rsql)
-//        when:
-//            query.and( rootNode.accept(visitor) )
-//        then:
-//            query.queryObject == expected
-//        where:
-//            rsql            | expected
-//            'title==Matrix' | [ name: 'Matrix' ]
-//            'entityId==123' | [ _id: '123' ]
-//    }
-//
-//    def 'convert RSQL to Mongo query with <field>.$id when field is @Reference'() {
-//        setup:
-//            def rootNode = parse(rsql)
-//        when:
-//            query.and( rootNode.accept(visitor) )
-//        then:
-//            query.queryObject == expected
-//        where:
-//            rsql          | expected
-//            'parent==123' | [ 'parent.$id': '123' ]
-//    }
+
+    // TODO: Logical operators: AND and OR
+
+    // TODO: Selectors which are not the same as field names
+
+    // TODO: Convert RSQL to Mongo query with <field>.$id when field is @Reference
 
 
     ////// Helpers ////////
-
-    def query(Closure c) {
-        def query = mongoTemplate.createQuery(RootEntity)
-        c.call(query)
-        query
-    }
 
     def parse(String rsql) {
         new RSQLParser(mongoOperators()).parse(rsql)
