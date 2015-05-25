@@ -4,7 +4,6 @@ RSQL for Spring Data MongoDB
 
 TODO
 
-
 Maven
 -----
 
