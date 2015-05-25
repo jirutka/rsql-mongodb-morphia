@@ -32,11 +32,13 @@ public abstract class MongoRSQLOperators extends RSQLOperators {
 
     public static final ComparisonOperator NIN = new ComparisonOperator("=nin=", true);
     public static final ComparisonOperator ALL = new ComparisonOperator("=all=", true);
+    public static final ComparisonOperator LIKE = new ComparisonOperator("=like=");
 
     public static Set<ComparisonOperator> mongoOperators() {
         Set<ComparisonOperator> set = defaultOperators();
         set.add(ALL);
         set.add(NIN);
+        set.add(LIKE);
         return set;
     }
 }

@@ -168,6 +168,29 @@
                 <version>${groovy-eclipse-compiler.version}</version>
                 <extensions>true</extensions>
             </plugin>
+            <plugin>
+               <groupId>org.codehaus.gmaven</groupId>
+               <artifactId>gmaven-plugin</artifactId>
+               <version>1.5</version>
+               <executions>
+                 <execution>
+                   <goals>
+                     <goal>testCompile</goal>
+                   </goals>
+                   </execution>
+               </executions>
+             </plugin>
+             <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-surefire-plugin</artifactId>
+               <version>2.12.3</version>
+               <configuration>
+                 <failIfNoTests>true</failIfNoTests>
+                 <includes>
+                   <include>**/*Test*.*</include>
+                 </includes>
+               </configuration>
+             </plugin>
         </plugins>
     </build>
 

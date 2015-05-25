@@ -42,9 +42,11 @@ class MongoRSQLVisitorTest extends Specification {
             'a=in=(a,b,c)'          | [ a: [ $in:  [['a', 'b','c']]]]
             'a=out=(b,c)'           | [ a: [ $nin: [['b','c']]]]
             'a=all=(x,y,z)'         | [ a: [ $all: [['x','y','z']]]]
+            'a==b,b==c'             | [ $or : [[ a: 'b'], [b: 'c']]]
+            'a==b;b==c'             | [ $and : [[ a: 'b'], [b: 'c']]]
+            'a==b,b==c;c==d'        | [ $or : [[ a: 'b'], [ $and: [[b: 'c'], [c: 'd']]]]]
+            '(a==b,b==c);c==d'      | [ $and : [[ $or: [[ a: 'b'], [b: 'c']]], [c: 'd']]]
     }
-
-    // TODO: Logical operators: AND and OR
 
     // TODO: Selectors which are not the same as field names
 
