@@ -23,13 +23,13 @@
  */
 package org.marchev.fiql.mongodb.springdata.exception;
 
-public class RSQLValidationException extends RSQLException {
+public class FIQLValidationException extends FIQLException {
 
-    public RSQLValidationException(String message, Throwable cause) {
+    public FIQLValidationException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public RSQLValidationException(String message) {
+    public FIQLValidationException(String message) {
         super(message);
     }
 }

@@ -21,19 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.fiql.mongodb.springdata.exception;
+package org.marchev.fiql.mongodb.springdata;
 
-public class RSQLException extends RuntimeException {
+import cz.jirutka.rsql.parser.RSQLParser;
+import cz.jirutka.rsql.parser.RSQLParserException;
+import cz.jirutka.rsql.parser.ast.Node;
+import org.marchev.fiql.mongodb.springdata.exception.FIQLException;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-    public RSQLException(String message) {
-        super(message);
+public class MongoFIQLImpl implements MongoFIQL {
+
+    private RSQLParser rsqlParser = new RSQLParser(MongoFIQLOperators.mongoOperators());
+
+    public Criteria createCriteria(String fiql) {
+        Node rootNode = parse(fiql);
+        MongoFIQLVisitor visitor = new MongoFIQLVisitor();
+        return rootNode.accept(visitor);
     }
 
-    public RSQLException(String message, Throwable cause) {
-        super(message, cause);
+    public Query createQuery(String fiql) {
+        Criteria criteria = createCriteria(fiql);
+        return new Query(criteria);
     }
 
-    public RSQLException(Throwable cause) {
-        super(cause);
+
+    protected Node parse(String fiql) {
+        try {
+            return rsqlParser.parse(fiql);
+        } catch (RSQLParserException ex) {
+            throw new FIQLException(ex);
+        }
     }
 }

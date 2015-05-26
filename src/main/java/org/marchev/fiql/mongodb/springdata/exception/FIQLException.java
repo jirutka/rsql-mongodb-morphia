@@ -23,21 +23,17 @@
  */
 package org.marchev.fiql.mongodb.springdata.exception;
 
-public class RSQLArgumentFormatException extends RSQLException {
+public class FIQLException extends RuntimeException {
 
-    private final String value;
-    private final Class<?> targetType;
-
-
-    public RSQLArgumentFormatException(String value, Class<?> targetType, Throwable cause) {
-        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()), cause);
-        this.value = value;
-        this.targetType = targetType;
+    public FIQLException(String message) {
+        super(message);
     }
 
-    public RSQLArgumentFormatException(String value, Class<?> targetType) {
-        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()));
-        this.value = value;
-        this.targetType = targetType;
+    public FIQLException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FIQLException(Throwable cause) {
+        super(cause);
     }
 }

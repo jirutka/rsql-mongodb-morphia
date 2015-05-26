@@ -6,17 +6,17 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static MongoRSQLOperators.mongoOperators
+import static MongoFIQLOperators.mongoOperators
 
-class MongoRSQLVisitorTest extends Specification {
+class MongoFIQLVisitorTest extends Specification {
 
     @Shared mongoOperations = TestUtils.createMongoOperations()
 
     def query = new Query()
-    def visitor = new MongoRSQLVisitor()
+    def visitor = new MongoFIQLVisitor()
 
 
-    // TODO: Throw RSQLValidationException when field could not be found
+    // TODO: Throw FIQLValidationException when field could not be found
 
     // TODO: Add test which tests the selector conversions based on entity types.
 
@@ -50,7 +50,7 @@ class MongoRSQLVisitorTest extends Specification {
 
     // TODO: Selectors which are not the same as field names
 
-    // TODO: Convert RSQL to Mongo query with <field>.$id when field is @Reference
+    // TODO: Convert FIQL to Mongo query with <field>.$id when field is @Reference
 
 
     ////// Helpers ////////

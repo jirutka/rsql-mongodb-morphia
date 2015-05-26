@@ -7,7 +7,7 @@ import java.util.Map;
 
 import net.jcip.annotations.ThreadSafe;
 
-import org.marchev.fiql.mongodb.springdata.exception.RSQLValidationException;
+import org.marchev.fiql.mongodb.springdata.exception.FIQLValidationException;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import cz.jirutka.rsql.parser.ast.AndNode;
@@ -24,21 +24,21 @@ import cz.jirutka.rsql.parser.ast.OrNode;
  * MongoDB/Morphia {@link Criteria}.
  */
 @ThreadSafe
-public class MongoRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
+public class MongoFIQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
 
     private static final Map<ComparisonOperator, CriteriaOperator> OPERATORS_MAP = new HashMap<ComparisonOperator, CriteriaOperator>() {
         private static final long serialVersionUID = 7545733207099350554L;
     {
-        put( MongoRSQLOperators.EQUAL,                 (criteria, arg)-> { return criteria.is(arg);  });
-        put( MongoRSQLOperators.GREATER_THAN_OR_EQUAL, (criteria, arg)-> { return criteria.gte(arg); });
-        put( MongoRSQLOperators.GREATER_THAN,          (criteria, arg)-> { return criteria.gt(arg);  });
-        put( MongoRSQLOperators.LESS_THAN_OR_EQUAL,    (criteria, arg)-> { return criteria.lte(arg); });
-        put( MongoRSQLOperators.LESS_THAN,             (criteria, arg)-> { return criteria.lt(arg);  });
-        put( MongoRSQLOperators.NOT_EQUAL,             (criteria, arg)-> { return criteria.ne(arg);  });
-        put( MongoRSQLOperators.IN,                    (criteria, arg)-> { return criteria.in(arg);  });
-        put( MongoRSQLOperators.NOT_IN,                (criteria, arg)-> { return criteria.nin(arg); });
-        put( MongoRSQLOperators.ALL,                   (criteria, arg)-> { return criteria.all(arg); });
-        put( MongoRSQLOperators.LIKE,                  (criteria, arg)-> { return criteria.regex(arg.toString()); });
+        put( MongoFIQLOperators.EQUAL,                 (criteria, arg)-> { return criteria.is(arg);  });
+        put( MongoFIQLOperators.GREATER_THAN_OR_EQUAL, (criteria, arg)-> { return criteria.gte(arg); });
+        put( MongoFIQLOperators.GREATER_THAN,          (criteria, arg)-> { return criteria.gt(arg);  });
+        put( MongoFIQLOperators.LESS_THAN_OR_EQUAL,    (criteria, arg)-> { return criteria.lte(arg); });
+        put( MongoFIQLOperators.LESS_THAN,             (criteria, arg)-> { return criteria.lt(arg);  });
+        put( MongoFIQLOperators.NOT_EQUAL,             (criteria, arg)-> { return criteria.ne(arg);  });
+        put( MongoFIQLOperators.IN,                    (criteria, arg)-> { return criteria.in(arg);  });
+        put( MongoFIQLOperators.NOT_IN,                (criteria, arg)-> { return criteria.nin(arg); });
+        put( MongoFIQLOperators.ALL,                   (criteria, arg)-> { return criteria.all(arg); });
+        put( MongoFIQLOperators.LIKE,                  (criteria, arg)-> { return criteria.regex(arg.toString()); });
     }};
 
     public Criteria visit(AndNode node) {
@@ -60,7 +60,7 @@ public class MongoRSQLVisitor extends NoArgRSQLVisitorAdapter<Criteria> {
      * @param node The comparison node to extract selector and argument from.
      * @return A field criteria for the given comparison.
      *
-     * @throws RSQLValidationException If the node contains more or less than
+     * @throws FIQLValidationException If the node contains more or less than
      *         one argument, or a matching field for the selector cannot be found.
      */
     protected Criteria createCriteria(ComparisonNode node) {

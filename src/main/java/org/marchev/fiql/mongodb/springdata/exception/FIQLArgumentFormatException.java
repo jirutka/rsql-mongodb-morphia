@@ -21,15 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.fiql.mongodb.springdata;
+package org.marchev.fiql.mongodb.springdata.exception;
+
+public class FIQLArgumentFormatException extends FIQLException {
+
+    private final String value;
+    private final Class<?> targetType;
 
 
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+    public FIQLArgumentFormatException(String value, Class<?> targetType, Throwable cause) {
+        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()), cause);
+        this.value = value;
+        this.targetType = targetType;
+    }
 
-public interface MongoRSQL {
-
-    Criteria createCriteria(String rsql);
-
-    Query createQuery(String rsql);
+    public FIQLArgumentFormatException(String value, Class<?> targetType) {
+        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()));
+        this.value = value;
+        this.targetType = targetType;
+    }
 }
