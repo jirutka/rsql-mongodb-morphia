@@ -21,26 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.rsql.mongodb.springdata.fixtures
+package org.marchev.fiql.mongodb.springdata
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.DBRef
-import org.springframework.data.mongodb.core.mapping.Field
+import com.github.fakemongo.Fongo
+import org.springframework.data.mongodb.core.MongoTemplate
 
-class RootEntity {
+abstract class TestUtils {
 
-    @Id Long entityId
-
-    String a, b, c, d
-
-    int year
-    Set<String> genres
-    List<ChildEntity> actors
-    ChildEntity director
-
-    @DBRef(lazy=true)
-    RootEntity parent
-
-    @Field('name')
-    String title
+    static MongoTemplate createMongoOperations() {
+        return new MongoTemplate(new Fongo('test').mongo, "testdb");
+    }
 }

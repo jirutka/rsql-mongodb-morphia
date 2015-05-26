@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013-2014 Czech Technical University in Prague.
+ * Copyright 2013-2014 Jakub Jirutka <jakub@jirutka.cz>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.rsql.mongodb.springdata;
+package org.marchev.fiql.mongodb.springdata;
 
+import cz.jirutka.rsql.parser.ast.ComparisonOperator;
+import cz.jirutka.rsql.parser.ast.RSQLOperators;
 
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+import java.util.Set;
 
-public interface MongoRSQL {
+public abstract class MongoRSQLOperators extends RSQLOperators {
 
-    Criteria createCriteria(String rsql);
+    public static final ComparisonOperator NIN = new ComparisonOperator("=nin=", true);
+    public static final ComparisonOperator ALL = new ComparisonOperator("=all=", true);
+    public static final ComparisonOperator LIKE = new ComparisonOperator("=like=");
 
-    Query createQuery(String rsql);
+    public static Set<ComparisonOperator> mongoOperators() {
+        Set<ComparisonOperator> set = defaultOperators();
+        set.add(ALL);
+        set.add(NIN);
+        set.add(LIKE);
+        return set;
+    }
 }

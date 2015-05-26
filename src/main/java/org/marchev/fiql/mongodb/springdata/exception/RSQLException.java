@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.rsql.mongodb.springdata.exception;
+package org.marchev.fiql.mongodb.springdata.exception;
 
 public class RSQLException extends RuntimeException {
 

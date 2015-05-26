@@ -7,14 +7,14 @@
 
     <!--//////////////////// ABOUT ////////////////////-->
 
-    <groupId>org.marchev.rsql</groupId>
-    <artifactId>rsql-mongodb-springdata</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>org.marchev</groupId>
+    <artifactId>fiql-mongodb-springdata</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>RSQL for Spring Data MongoDB</name>
-    <description>RSQL converter for Spring Data MongoDB.</description>
-    <url>https://github.com/marchev/rsql-mongodb-springdata</url>
+    <name>FIQL for Spring Data MongoDB</name>
+    <description>Parse FIQL queries into Spring Data MongoDB criterias.</description>
+    <url>https://github.com/marchev/fiql-mongodb-springdata</url>
     <inceptionYear>2015</inceptionYear>
 
     <developers>
@@ -37,13 +37,13 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/marchev/rsql-mongodb-springdata</url>
-        <connection>scm:git:git@github.com:marchev/rsql-mongodb-springdata.git</connection>
+        <url>https://github.com/marchev/fiql-mongodb-springdata</url>
+        <connection>scm:git:git@github.com:marchev/fiql-mongodb-springdata.git</connection>
     </scm>
 
     <ciManagement>
         <system>travis</system>
-        <url>https://travis-ci.org/marchev/rsql-mongodb-springdata</url>
+        <url>https://travis-ci.org/marchev/fiql-mongodb-springdata</url>
     </ciManagement>
 
     <!--//////////////////// PROPERTIES //////////////////////-->

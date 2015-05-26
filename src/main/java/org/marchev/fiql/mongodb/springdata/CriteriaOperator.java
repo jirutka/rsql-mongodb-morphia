@@ -1,4 +1,4 @@
-package org.marchev.rsql.mongodb.springdata;
+package org.marchev.fiql.mongodb.springdata;
 
 import org.springframework.data.mongodb.core.query.Criteria;
 

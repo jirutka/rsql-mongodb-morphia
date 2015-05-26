@@ -21,10 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.marchev.rsql.mongodb.springdata.fixtures
+package org.marchev.fiql.mongodb.springdata;
 
-class ChildEntity {
 
-    Date birthdate
-    List<RootEntity> movies
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+
+public interface MongoRSQL {
+
+    Criteria createCriteria(String rsql);
+
+    Query createQuery(String rsql);
 }

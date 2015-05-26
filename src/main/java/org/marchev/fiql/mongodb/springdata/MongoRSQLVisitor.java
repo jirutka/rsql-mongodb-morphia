@@ -1,4 +1,4 @@
-package org.marchev.rsql.mongodb.springdata;
+package org.marchev.fiql.mongodb.springdata;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.Map;
 
 import net.jcip.annotations.ThreadSafe;
 
-import org.marchev.rsql.mongodb.springdata.exception.RSQLValidationException;
+import org.marchev.fiql.mongodb.springdata.exception.RSQLValidationException;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import cz.jirutka.rsql.parser.ast.AndNode;
