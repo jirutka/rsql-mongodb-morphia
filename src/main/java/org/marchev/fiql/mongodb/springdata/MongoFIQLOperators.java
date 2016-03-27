@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013-2014 Czech Technical University in Prague.
+ * Copyright 2013-2014 Jakub Jirutka <jakub@jirutka.cz>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,33 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package cz.jirutka.rsql.mongodb.morphia;
+package org.marchev.fiql.mongodb.springdata;
 
-import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.core.convert.ConversionService;
+import cz.jirutka.rsql.parser.ast.ComparisonOperator;
+import cz.jirutka.rsql.parser.ast.RSQLOperators;
 
-public class SpringConversionServiceAdapter extends AbstractStringConverter {
+import java.util.Set;
 
-    private final ConversionService conversionService;
+public abstract class MongoFIQLOperators extends RSQLOperators {
 
+    public static final ComparisonOperator NIN = new ComparisonOperator("=nin=", true);
+    public static final ComparisonOperator ALL = new ComparisonOperator("=all=", true);
+    public static final ComparisonOperator LIKE = new ComparisonOperator("=like=");
 
-    public SpringConversionServiceAdapter(ConversionService conversionService) {
-        this.conversionService = conversionService;
+    public static Set<ComparisonOperator> mongoOperators() {
+        Set<ComparisonOperator> set = defaultOperators();
+        set.add(ALL);
+        set.add(NIN);
+        set.add(LIKE);
+        return set;
     }
-
-
-    @SuppressWarnings("unchecked")
-    public <T> T convert(String value, Class<T> targetType) {
-
-        if (targetType == String.class) {
-            return (T) value;
-        }
-        try {
-            return conversionService.convert(value, targetType);
-
-        } catch (ConversionFailedException ex) {
-            throw new RSQLArgumentFormatException(value, targetType, ex);
-        }
-    }
-
 }

@@ -21,26 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package cz.jirutka.rsql.mongodb.morphia;
+package org.marchev.fiql.mongodb.springdata.fixtures
 
-import java.util.ArrayList;
-import java.util.Collection;
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.DBRef
+import org.springframework.data.mongodb.core.mapping.Field
 
-public abstract class AbstractStringConverter implements StringConverter {
+class RootEntity {
 
-    @SuppressWarnings("unchecked")
-    public <T> Collection<? extends T> convert(Collection<String> source, Class<T> targetType) {
+    @Id Long entityId
 
-        if (targetType == String.class) {
-            return (Collection<T>) source;
-        }
-        Collection<T> result = new ArrayList<>();
+    String a, b, c, d
 
-        if (source != null) {
-            for (String s : source) {
-                result.add(convert(s, targetType));
-            }
-        }
-        return result;
-    }
+    int year
+    Set<String> genres
+    List<ChildEntity> actors
+    ChildEntity director
+
+    @DBRef(lazy=true)
+    RootEntity parent
+
+    @Field('name')
+    String title
 }

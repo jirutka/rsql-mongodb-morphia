@@ -21,23 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package cz.jirutka.rsql.mongodb.morphia;
+package org.marchev.fiql.mongodb.springdata;
 
-import java.util.Collection;
 
-public interface StringConverter {
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-    /**
-     * Convert the given {@code String} to targetType.
-     *
-     * @throws RSQLArgumentFormatException if a conversion exception occurred.
-     */
-    <T> T convert(String value, Class<T> targetType);
+public interface MongoFIQL {
 
-    /**
-     * Convert {@code String} values from the given collection to the targetType.
-     *
-     * @throws RSQLArgumentFormatException if a conversion exception occurred.
-     */
-    <T> Collection<? extends T> convert(Collection<String> source, Class<T> targetType);
+    Criteria createCriteria(String fiql);
+
+    Query createQuery(String fiql);
 }

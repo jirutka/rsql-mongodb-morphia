@@ -21,38 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package cz.jirutka.rsql.mongodb.morphia
+package org.marchev.fiql.mongodb.springdata.fixtures
 
-import org.springframework.core.convert.ConversionFailedException
-import org.springframework.core.convert.ConversionService
-import spock.lang.Specification
+class ChildEntity {
 
-class SpringConversionServiceAdapterTest extends Specification {
-
-    def conversionService = Mock(ConversionService)
-    def adapter = new SpringConversionServiceAdapter(conversionService)
-
-
-    def 'delegate conversion to ConversionService'() {
-        when:
-            adapter.convert('42', Integer)
-        then:
-            1 * conversionService.convert('42', Integer)
-    }
-
-    def "don't convert String"() {
-        when:
-            adapter.convert('allons-y!', String)
-        then:
-            0 * conversionService._
-    }
-
-    def 'throw ArgumentFormatException when conversion fails'() {
-        setup:
-            conversionService._ >> { throw new ConversionFailedException(null, null, null, new RuntimeException()) }
-        when:
-            adapter.convert('bang!', Date)
-        then:
-            thrown RSQLArgumentFormatException
-    }
+    Date birthdate
+    List<RootEntity> movies
 }

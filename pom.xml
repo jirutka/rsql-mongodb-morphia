@@ -4,31 +4,25 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>cz.jirutka.maven</groupId>
-        <artifactId>groovy-lombok-parent</artifactId>
-        <version>1.1.6</version>
-    </parent>
-
 
     <!--//////////////////// ABOUT ////////////////////-->
 
-    <groupId>cz.jirutka.rsql</groupId>
-    <artifactId>rsql-mongodb-morphia</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>org.marchev</groupId>
+    <artifactId>fiql-mongodb-springdata</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>RSQL for MongoDB-Morphia</name>
-    <description>RSQL converter for MongoDB/Morphia.</description>
-    <url>http://github.com/jirutka/rsql-mongodb-morphia</url>
-    <inceptionYear>2014</inceptionYear>
+    <name>FIQL for Spring Data MongoDB</name>
+    <description>Parse FIQL queries into Spring Data MongoDB criterias.</description>
+    <url>https://github.com/marchev/fiql-mongodb-springdata</url>
+    <inceptionYear>2015</inceptionYear>
 
     <developers>
         <developer>
-            <name>Jakub Jirutka</name>
-            <email>jakub@jirutka.cz</email>
-            <organization>CTU in Prague</organization>
-            <organizationUrl>http://www.cvut.cz</organizationUrl>
+            <name>Martin Hristov</name>
+            <email>n1tmare@gmail.com</email>
+            <organization>Bits by Martin</organization>
+            <organizationUrl>bits.marchev.org</organizationUrl>
         </developer>
     </developers>
 
@@ -43,15 +37,25 @@
     </licenses>
 
     <scm>
-        <url>http://github.com/jirutka/rsql-mongodb-morphia</url>
-        <connection>scm:git:git@github.com:jirutka/rsql-mongodb-morphia.git</connection>
+        <url>https://github.com/marchev/fiql-mongodb-springdata</url>
+        <connection>scm:git:git@github.com:marchev/fiql-mongodb-springdata.git</connection>
     </scm>
 
     <ciManagement>
         <system>travis</system>
-        <url>https://travis-ci.org/jirutka/rsql-mongodb-morphia</url>
+        <url>https://travis-ci.org/marchev/fiql-mongodb-springdata</url>
     </ciManagement>
 
+    <!--//////////////////// PROPERTIES //////////////////////-->
+
+    <properties>
+        <spring.version>4.1.5.RELEASE</spring.version>
+        <spring.data.version>1.7.0.RELEASE</spring.data.version>
+        <slf4j.version>1.7.7</slf4j.version>
+        <groovyVersion>2.4.3</groovyVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <groovy-eclipse-compiler.version>2.9.2-01</groovy-eclipse-compiler.version>
+    </properties>
 
     <!--//////////////////// DEPENDENCIES ////////////////////-->
 
@@ -59,27 +63,31 @@
         <dependency>
             <groupId>cz.jirutka.rsql</groupId>
             <artifactId>rsql-parser</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>2.0.0</version>
         </dependency>
 
         <dependency>
-            <groupId>org.mongodb.morphia</groupId>
-            <artifactId>morphia</artifactId>
-            <version>0.107</version>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovyVersion}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>[3.0.0.RELEASE,)</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <version>${spring.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+            <version>${spring.data.version}</version>
         </dependency>
 
         <dependency>
@@ -92,7 +100,7 @@
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
-            <version>0.7-groovy-2.0</version>
+            <version>1.0-groovy-2.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.codehaus.groovy</groupId>
@@ -110,23 +118,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.11.4</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
             <version>3.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -144,5 +138,332 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <compilerId>groovy-eclipse-compiler</compilerId>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-compiler</artifactId>
+                        <version>${groovy-eclipse-compiler.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-batch</artifactId>
+                        <version>2.4.3-01</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-eclipse-compiler</artifactId>
+                <version>${groovy-eclipse-compiler.version}</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12.3</version>
+                <configuration>
+                    <failIfNoTests>true</failIfNoTests>
+                    <includes>
+                        <include>**/*Test*.*</include>
+                    </includes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <configuration>
+                    <timestampFormat>{0,date,yyyy-MM-dd'T'HH:mm:ssZ}</timestampFormat>
+                    <revisionOnScmFailure>UNKNOWN</revisionOnScmFailure>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+
+            <!-- Create JAR archive with the project sources. -->
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Create JAR archive with the project JavaDoc. -->
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Sign the project artifacts with GnuPG. -->
+            <plugin>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Deploy artifacts to remote Maven repository. -->
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>deploy</id>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.2</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                    <executions>
+                        <!-- Disable execution of deploy plugin defined in super-pom to enforce our execution order. -->
+                        <execution>
+                            <id>default-deploy</id>
+                            <phase>none</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.6</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.5</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            </manifest>
+                            <manifestEntries>
+                                <Built-Date>${timestamp}</Built-Date>
+                                <Implementation-Build>${buildNumber}</Implementation-Build>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.10.1</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.4</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.9.1</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.3</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.4.201502262128</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.eluder.coveralls</groupId>
+                    <artifactId>coveralls-maven-plugin</artifactId>
+                    <version>3.0.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+
+    <!--//////////////////// PROFILES ////////////////////-->
+
+    <profiles>
+        <!--
+            General profile for CI to analyze code coverage.
+        -->
+        <profile>
+            <id>ci</id>
+
+            <!-- Will be automatically activated on Travis CI and possibly other CI environments. -->
+            <activation>
+                <property>
+                    <name>env.CI</name>
+                </property>
+            </activation>
+
+            <properties>
+                <!-- Properties specific for Sonar -->
+                <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+                <sonar.jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</sonar.jacoco.itReportPath>
+            </properties>
+
+            <build>
+                <plugins>
+                    <!--
+                        Analyze code coverage with JaCoCo.
+                    -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>prepare-agent-integration</id>
+                                <goals>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--
+            Profile for Travis CI to use Coveralls.
+        -->
+        <profile>
+            <id>travis-ci</id>
+
+            <!-- Will be automatically activated on Travis CI. -->
+            <activation>
+                <property>
+                    <name>env.TRAVIS</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <!-- Merge execution data for unit and integration tests. -->
+                            <execution>
+                                <id>merge-exec-data</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>merge</goal>
+                                </goals>
+                                <configuration>
+                                    <fileSets>
+                                        <fileSet>
+                                            <directory>${project.build.directory}</directory>
+                                            <includes>
+                                                <include>*.exec</include>
+                                            </includes>
+                                        </fileSet>
+                                    </fileSets>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!--
+                        Plugin for submitting code coverage reports to Coveralls.
+                        To get it work on Travis, add these lines into your .travis.yml:
+                            script: 'mvn verify -B'
+                            after_success: 'mvn jacoco:report coveralls:jacoco'
+                    -->
+                    <plugin>
+                        <groupId>org.eluder.coveralls</groupId>
+                        <artifactId>coveralls-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

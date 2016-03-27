@@ -21,26 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package cz.jirutka.rsql.mongodb.morphia;
+package org.marchev.fiql.mongodb.springdata
 
-import lombok.Getter;
+import com.github.fakemongo.Fongo
+import org.springframework.data.mongodb.core.MongoTemplate
 
-@Getter
-public class RSQLArgumentFormatException extends RSQLException {
+abstract class TestUtils {
 
-    private final String value;
-    private final Class<?> targetType;
-
-
-    public RSQLArgumentFormatException(String value, Class<?> targetType, Throwable cause) {
-        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()), cause);
-        this.value = value;
-        this.targetType = targetType;
-    }
-
-    public RSQLArgumentFormatException(String value, Class<?> targetType) {
-        super(String.format("Cannot convert value '%s' to: %s", value, targetType.getName()));
-        this.value = value;
-        this.targetType = targetType;
+    static MongoTemplate createMongoOperations() {
+        return new MongoTemplate(new Fongo('test').mongo, "testdb");
     }
 }

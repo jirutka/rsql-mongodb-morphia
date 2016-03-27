@@ -21,15 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package cz.jirutka.rsql.mongodb.morphia
+package org.marchev.fiql.mongodb.springdata.exception;
 
-import com.github.fakemongo.Fongo
-import org.mongodb.morphia.Datastore
-import org.mongodb.morphia.Morphia
+public class FIQLException extends RuntimeException {
 
-abstract class TestUtils {
+    public FIQLException(String message) {
+        super(message);
+    }
 
-    static Datastore createDatastore() {
-        new Morphia().createDatastore(new Fongo('test').mongo, 'testdb')
+    public FIQLException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FIQLException(Throwable cause) {
+        super(cause);
     }
 }

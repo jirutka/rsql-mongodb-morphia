@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013-2014 Jakub Jirutka <jakub@jirutka.cz>.
+ * Copyright 2013-2014 Czech Technical University in Prague.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package cz.jirutka.rsql.mongodb.morphia.internal;
+package org.marchev.fiql.mongodb.springdata;
 
-import org.mongodb.morphia.query.Criteria;
-import org.mongodb.morphia.query.CriteriaContainerImpl;
-import org.mongodb.morphia.query.CriteriaJoin;
+import cz.jirutka.rsql.parser.RSQLParser;
+import cz.jirutka.rsql.parser.RSQLParserException;
+import cz.jirutka.rsql.parser.ast.Node;
+import org.marchev.fiql.mongodb.springdata.exception.FIQLException;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.Collection;
+public class MongoFIQLImpl implements MongoFIQL {
 
-/**
- * Subclass of {@link CriteriaContainerImpl} needed just to access the
- * protected constructor.
- */
-public class SimpleCriteriaContainer extends CriteriaContainerImpl {
+    private RSQLParser rsqlParser = new RSQLParser(MongoFIQLOperators.mongoOperators());
 
-    public SimpleCriteriaContainer(CriteriaJoin joinMethod) {
-        super(joinMethod);
+    public Criteria createCriteria(String fiql) {
+        Node rootNode = parse(fiql);
+        MongoFIQLVisitor visitor = new MongoFIQLVisitor();
+        return rootNode.accept(visitor);
     }
 
-    public SimpleCriteriaContainer(CriteriaJoin joinMethod, Collection<? extends Criteria> children) {
-        super(joinMethod);
-        add(children.toArray(new Criteria[children.size()]));
+    public Query createQuery(String fiql) {
+        Criteria criteria = createCriteria(fiql);
+        return new Query(criteria);
+    }
+
+
+    protected Node parse(String fiql) {
+        try {
+            return rsqlParser.parse(fiql);
+        } catch (RSQLParserException ex) {
+            throw new FIQLException(ex);
+        }
     }
 }
